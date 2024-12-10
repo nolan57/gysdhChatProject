@@ -1,0 +1,164 @@
+{% extends 'conferenceApp/base.html' %}
+{% load static %}
+
+{% block title %}{{ conference.name }} - 问卷完成度统计{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                {{ conference.name }} - 问卷完成度统计
+            </h1>
+            <div class="flex space-x-4">
+                <a href="{% url 'conference:export_completion_stats' conference.id %}" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-file-excel mr-2"></i>
+                    导出统计数据
+                </a>
+                <a href="{% url 'conference:export_completion_report' conference.id %}" 
+                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    <i class="fas fa-file-pdf mr-2"></i>
+                    生成报告
+                </a>
+            </div>
+        </div>
+        
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+                        问卷完成情况
+                    </h2>
+                    <canvas id="surveyCompletionChart" class="w-full h-64"></canvas>
+                </div>
+                
+                <div>
+                    <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+                        问卷详细统计
+                    </h2>
+                    <div class="space-y-4">
+                        {% for survey_stat in stats.surveys %}
+                        <div class="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-gray-900 dark:text-gray-100">
+                                    {{ survey_stat.survey.title }}
+                                </span>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">
+                                    {{ survey_stat.completion_rate }}% 完成
+                                </span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5">
+                                <div class="bg-indigo-600 h-2.5 rounded-full" 
+                                     style="width: {{ survey_stat.completion_rate }}%"></div>
+                            </div>
+                            <div class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                完成人数：{{ survey_stat.completed_count }} / {{ survey_stat.total_participants }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8">
+                <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+                    参与者完成情况
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-900">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    参与者
+                                </th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    完成问卷数
+                                </th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    完成率
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            {% for participant in participants %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                    {{ participant.participant.user.get_full_name }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400">
+                                    {{ participant.completed_count }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400">
+                                    {{ participant.completion_rate }}%
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 获取图表数据
+    fetch("{% url 'conference:survey_completion_chart' conference.id %}")
+        .then(response => response.json())
+        .then(data => {
+            const ctx = document.getElementById('surveyCompletionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: '完成率',
+                            data: data.completion_rates,
+                            backgroundColor: data.colors,
+                            borderColor: data.colors.map(color => color + '88'),
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: '完成率 (%)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const index = context.dataIndex;
+                                    return [
+                                        `完成率: ${context.formattedValue}%`,
+                                        `完成人数: ${data.completed_counts[index]}`,
+                                        `总参与者: ${data.total_participants[index]}`
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+});
+</script>
+{% endblock %}

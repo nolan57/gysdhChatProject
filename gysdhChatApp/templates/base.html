@@ -1,0 +1,534 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ settings.chat_title|default:"GYSDH Chat" }}{% endblock %}</title>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- TinyMCE -->
+    <script src="{% static 'js/tinymce/tinymce/tinymce.min.js' %}"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#4F46E5',
+                            dark: '#4338CA'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    typography: {
+                        DEFAULT: {
+                            css: {
+                                maxWidth: 'none',
+                                color: '#374151',
+                                a: {
+                                    color: '#3182ce',
+                                    '&:hover': {
+                                        color: '#2c5282',
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                dark: {
+                    primary: '#4338CA',
+                    secondary: '#6B7280',
+                    background: '#1F2937',
+                    text: '#F9FAFB',
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+    
+        /* 自定义滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        .dark ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        
+        .dark ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+        }
+        
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+        
+        /* 消息气泡样式 */
+        .message-bubble {
+            max-width: 80%;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border-radius: 1rem;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            color: #1a1a1a;
+        }
+
+        .dark .message-bubble {
+            color: #e5e7eb;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .message-bubble.current-user {
+            margin-left: auto;
+            background-color: #E7F6EC;
+            border-bottom-right-radius: 0.25rem;
+        }
+
+        .dark .message-bubble.current-user {
+            background-color: #065f46;
+        }
+
+        .message-bubble.other-user {
+            background-color: #f3f4f6;
+            border-bottom-left-radius: 0.25rem;
+        }
+
+        .dark .message-bubble.other-user {
+            background-color: #374151;
+        }
+
+        .message-bubble.other-user.online {
+            background-color: #E3F2FD;
+        }
+
+        .dark .message-bubble.other-user.online {
+            background-color: #1e3a8a;
+        }
+
+        .message-bubble.other-user.offline {
+            background-color: #F5F5F5;
+        }
+
+        .dark .message-bubble.other-user.offline {
+            background-color: #374151;
+        }
+
+        .message-sender {
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .message-sender .company-code {
+            color: #6B7280;
+            margin-right: 0.5rem;
+        }
+
+        .message-sender .user-name {
+            color: #374151;
+        }
+
+        .message-bubble.online .message-sender .user-name {
+            color: #1E88E5; /* 蓝色文字 */
+        }
+
+        .message-bubble.offline .message-sender .user-name {
+            color: #9E9E9E; /* 灰色文字 */
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            opacity: 0.75;
+        }
+
+        /* 在线状态指示器 */
+        .online-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .online-indicator.online {
+            background-color: #4CAF50; /* 绿色 */
+        }
+
+        .online-indicator.offline {
+            background-color: #9E9E9E; /* 灰色 */
+        }
+        
+        /* 图片预览样式 */
+        .image-preview {
+            margin-top: 0.5rem;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: auto;
+            max-height: 300px;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* 文件附件样式 */
+        .file-attachment {
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .current-user .file-attachment {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .file-attachment i {
+            opacity: 0.7;
+        }
+
+        .file-attachment a {
+            color: inherit;
+            text-decoration: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-attachment a:hover {
+            text-decoration: underline;
+        }
+
+        /* 输入框样式 */
+        .input {
+            @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all duration-200;
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            @apply px-4 py-2 rounded-lg transition-all duration-200 flex items-center justify-center;
+        }
+        
+        .btn-primary {
+            @apply bg-primary text-white hover:bg-primary-dark;
+        }
+        
+        .btn-secondary {
+            @apply bg-gray-100 text-gray-700 hover:bg-gray-200;
+        }
+        
+        /* 动画 */
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 开关样式 */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            background-color: white;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        input:checked + .toggle-switch {
+            background-color: #4F46E5;
+        }
+
+        input:checked + .toggle-switch::after {
+            transform: translateX(20px);
+        }
+
+        input:disabled + .toggle-switch {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* 富文本内容样式 */
+        .announcement-content {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #374151;
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+
+        /* 标题样式 */
+        .announcement-content h1,
+        .announcement-content h2,
+        .announcement-content h3 {
+            font-weight: 600;
+            line-height: 1.3;
+            margin: 1.5em 0 0.5em;
+            color: #111827;
+        }
+
+        .announcement-content h1 { font-size: 1.875em; }
+        .announcement-content h2 { font-size: 1.5em; }
+        .announcement-content h3 { font-size: 1.25em; }
+
+        /* 段落和列表样式 */
+        .announcement-content p {
+            margin: 1em 0;
+        }
+
+        .announcement-content ul,
+        .announcement-content ol {
+            margin: 1em 0;
+            padding-left: 1.5em;
+        }
+
+        .announcement-content ul {
+            list-style-type: disc;
+        }
+
+        .announcement-content ol {
+            list-style-type: decimal;
+        }
+
+        .announcement-content li {
+            margin: 0.5em 0;
+        }
+
+        /* 文本格式化 */
+        .announcement-content strong,
+        .announcement-content b {
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .announcement-content em,
+        .announcement-content i {
+            font-style: italic;
+            color: inherit;
+        }
+
+        .announcement-content u {
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .announcement-content del {
+            text-decoration: line-through;
+            color: #6B7280;
+        }
+
+        /* 链接样式 */
+        .announcement-content a {
+            color: #2563EB;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            transition: color 0.2s;
+        }
+
+        .announcement-content a:hover {
+            color: #1D4ED8;
+        }
+
+        /* 表格样式 */
+        .announcement-content table {
+            width: 100%;
+            margin: 1em 0;
+            border-collapse: collapse;
+        }
+
+        .announcement-content th,
+        .announcement-content td {
+            padding: 0.75em;
+            border: 1px solid #E5E7EB;
+            text-align: left;
+        }
+
+        .announcement-content th {
+            background-color: #F9FAFB;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .announcement-content tr:nth-child(even) {
+            background-color: #F9FAFB;
+        }
+
+        /* 图片样式 */
+        .announcement-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.375rem;
+            margin: 1em 0;
+        }
+
+        /* 引用样式 */
+        .announcement-content blockquote {
+            margin: 1.5em 0;
+            padding: 0.5em 0 0.5em 1em;
+            border-left: 4px solid #E5E7EB;
+            color: #4B5563;
+            font-style: italic;
+            background-color: #F9FAFB;
+            border-radius: 0 0.375rem 0.375rem 0;
+        }
+
+        /* 代码样式 */
+        .announcement-content pre {
+            background-color: #F3F4F6;
+            padding: 1em;
+            border-radius: 0.375rem;
+            overflow-x: auto;
+            margin: 1em 0;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.875em;
+            line-height: 1.7;
+        }
+
+        .announcement-content code {
+            background-color: #F3F4F6;
+            padding: 0.2em 0.4em;
+            border-radius: 0.25em;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.875em;
+        }
+
+        /* 水平分割线 */
+        .announcement-content hr {
+            margin: 2em 0;
+            border: 0;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        /* 文字颜色适配 */
+        .announcement-content [style*="color"] {
+            color: inherit;
+        }
+
+        /* 表情符号 */
+        .announcement-content .emoji {
+            display: inline-block;
+            width: 1.5em;
+            height: 1.5em;
+            vertical-align: -0.3em;
+        }
+        
+        /* 文字对齐样式 */
+        .announcement-content .text-left {
+            text-align: left;
+        }
+        
+        .announcement-content .text-center {
+            text-align: center;
+        }
+        
+        .announcement-content .text-right {
+            text-align: right;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="antialiased bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+    {% block content %}
+        
+    {% endblock %}
+    
+    <!-- 主题切换脚本 -->
+    <script>
+        // 检查系统主题偏好和本地存储的主题设置
+        function setTheme() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        // 主题切换函数
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+
+        // 初始化主题
+        setTheme();
+
+        // 监听系统主题变化
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (!('theme' in localStorage)) {
+                if (e.matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

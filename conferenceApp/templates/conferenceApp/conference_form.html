@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
+            {% if form.instance.pk %}
+            编辑会议
+            {% else %}
+            创建新会议
+            {% endif %}
+        </h2>
+        
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            <div class="space-y-8">
+                {# 添加自定义样式到表单标签和字段集 #}
+                <style>
+                    /* 表单组样式 */
+                    .form-group {
+                        @apply mb-4;
+                    }
+                    
+                    /* 标签样式 */
+                    .form-group label {
+                        @apply block text-gray-700 dark:text-gray-300 font-medium mb-1;
+                    }
+                    
+                    /* 必填字段星号 */
+                    .form-group .asteriskField {
+                        @apply text-red-500;
+                    }
+                    
+                    /* 字段集标题 */
+                    legend {
+                        @apply text-lg font-medium text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 w-full;
+                    }
+                    
+                    /* 字段集容器 */
+                    fieldset {
+                        @apply p-4 rounded-lg border border-gray-200 dark:border-gray-700;
+                    }
+                    
+                    /* 输入框 */
+                    .form-group input[type="text"],
+                    .form-group input[type="email"],
+                    .form-group input[type="number"],
+                    .form-group input[type="date"],
+                    .form-group input[type="datetime-local"],
+                    .form-group input[type="time"],
+                    .form-group input[type="tel"],
+                    .form-group input[type="url"],
+                    .form-group textarea,
+                    .form-group select {
+                        @apply mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 
+                               shadow-sm focus:border-blue-500 focus:ring-blue-500
+                               bg-white dark:bg-gray-700 text-gray-900 dark:text-white;
+                    }
+                    
+                    /* 复选框和单选框容器 */
+                    .form-check {
+                        @apply flex items-center;
+                    }
+                    
+                    /* 复选框和单选框 */
+                    .form-check input[type="checkbox"],
+                    .form-check input[type="radio"] {
+                        @apply h-4 w-4 text-blue-500 border-gray-300 dark:border-gray-600
+                               rounded focus:ring-blue-500 dark:bg-gray-700;
+                    }
+                    
+                    /* 复选框和单选框标签 */
+                    .form-check label {
+                        @apply ml-2 block text-gray-700 dark:text-gray-300;
+                    }
+                    
+                    /* 帮助文本 */
+                    .form-text {
+                        @apply mt-1 text-sm text-gray-500 dark:text-gray-400;
+                    }
+                    
+                    /* 错误消息 */
+                    .invalid-feedback {
+                        @apply mt-1 text-sm text-red-600 dark:text-red-400;
+                    }
+                    
+                    /* 禁用状态 */
+                    .form-group input:disabled,
+                    .form-group select:disabled,
+                    .form-group textarea:disabled {
+                        @apply bg-gray-100 dark:bg-gray-600 cursor-not-allowed;
+                    }
+                </style>
+                
+                {{ form|crispy }}
+                
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">联系人信息</h3>
+                    {{ contact_formset.management_form }}
+                    <div id="contact-forms">
+                        {% for contact_form in contact_formset %}
+                            <div class="contact-form mb-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                {{ contact_form|crispy }}
+                                <div class="flex justify-end mt-4">
+                                    <button type="button" class="remove-contact bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition duration-150 ease-in-out">
+                                        删除联系人
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="flex justify-end mt-4">
+                        <button type="button" id="add-contact" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition duration-150 ease-in-out">
+                            添加联系人
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <a href="{% url 'conference:list' %}" class="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150 ease-in-out">
+                    取消
+                </a>
+                <button type="submit" class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-150 ease-in-out">
+                    {{ submit_text|default:'保存' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<template id="contact-form-template">
+    <div class="contact-form mb-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+        {{ contact_formset.empty_form|crispy }}
+        <div class="flex justify-end mt-4">
+            <button type="button" class="remove-contact bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition duration-150 ease-in-out">
+                删除联系人
+            </button>
+        </div>
+    </div>
+</template>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const addContactBtn = document.getElementById('add-contact');
+        const contactForms = document.getElementById('contact-forms');
+        const template = document.getElementById('contact-form-template');
+        const totalFormsInput = document.querySelector('[name="contact_set-TOTAL_FORMS"]');
+        
+        let formCount = parseInt(totalFormsInput.value);
+        
+        function bindRemoveButtons() {
+            document.querySelectorAll('.remove-contact').forEach(button => {
+                button.addEventListener('click', function() {
+                    this.closest('.contact-form').remove();
+                    totalFormsInput.value = --formCount;
+                });
+            });
+        }
+        
+        addContactBtn.addEventListener('click', function() {
+            const newFormHtml = template.innerHTML.replace(
+                /contact_set-__prefix__/g,
+                `contact_set-${formCount}`
+            );
+            
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = newFormHtml;
+            const newForm = tempDiv.firstElementChild;
+            
+            contactForms.appendChild(newForm);
+            totalFormsInput.value = ++formCount;
+            bindRemoveButtons();
+        });
+        
+        bindRemoveButtons();
+    });
+</script>
+{% endblock %}

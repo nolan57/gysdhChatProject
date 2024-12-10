@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}文件下载记录 - GYSDH CHAT{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 页面标题 -->
+        <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center">
+                <i class="fas fa-download text-purple-600 text-4xl mr-4"></i>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600">文件下载记录</h1>
+            </div>
+            <a href="{% url 'system_management' %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200">
+                <i class="fas fa-arrow-left mr-2"></i>
+                返回系统管理
+            </a>
+        </div>
+
+        <!-- 筛选表单 -->
+        <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+            <form method="get" action="{% url 'file_download_log' %}" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- 用户名筛选 -->
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700">用户名</label>
+                        <input type="text" name="username" id="username" value="{{ filters.username }}"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                            placeholder="输入用户名搜索">
+                    </div>
+                    
+                    <!-- 文件名筛选 -->
+                    <div>
+                        <label for="file_name" class="block text-sm font-medium text-gray-700">文件名</label>
+                        <input type="text" name="file_name" id="file_name" value="{{ filters.file_name }}"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                            placeholder="输入文件名搜索">
+                    </div>
+
+                    <!-- 文件类型筛选 -->
+                    <div>
+                        <label for="file_type" class="block text-sm font-medium text-gray-700">文件类型</label>
+                        <select name="file_type" id="file_type"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm">
+                            <option value="">全部类型</option>
+                            {% for type in file_types %}
+                            <option value="{{ type }}" {% if filters.file_type == type %}selected{% endif %}>
+                                {% if type == 'message' %}消息文件
+                                {% elif type == 'announcement' %}公告文件
+                                {% else %}{{ type }}{% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- 开始日期 -->
+                    <div>
+                        <label for="date_from" class="block text-sm font-medium text-gray-700">开始日期</label>
+                        <input type="date" name="date_from" id="date_from" value="{{ filters.date_from }}"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm">
+                    </div>
+
+                    <!-- 结束日期 -->
+                    <div>
+                        <label for="date_to" class="block text-sm font-medium text-gray-700">结束日期</label>
+                        <input type="date" name="date_to" id="date_to" value="{{ filters.date_to }}"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm">
+                    </div>
+
+                    <!-- IP地址筛选 -->
+                    <div>
+                        <label for="ip_address" class="block text-sm font-medium text-gray-700">IP地址</label>
+                        <input type="text" name="ip_address" id="ip_address" value="{{ filters.ip_address }}"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                            placeholder="输入IP地址搜索">
+                    </div>
+                </div>
+
+                <!-- 按钮组 -->
+                <div class="flex justify-end space-x-3">
+                    <a href="{% url 'file_download_log' %}"
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                        <i class="fas fa-redo mr-2"></i>
+                        重置
+                    </a>
+                    <button type="submit"
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                        <i class="fas fa-search mr-2"></i>
+                        搜索
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 下载记录表格 -->
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">下载时间</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">文件名</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">文件类型</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">文件大小</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP地址</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">浏览器信息</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for log in logs %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ log.downloaded_at|date:"Y-m-d H:i:s" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <div class="flex items-center">
+                                    <div class="ml-4">
+                                        {% if log.user %}
+                                            {{ log.user.name }}
+                                            <div class="text-xs text-gray-500">({{ log.user.number }})</div>
+                                        {% else %}
+                                            <span class="text-gray-400">未知用户</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ log.file_name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {% if log.file_type == 'message' %}消息文件
+                                {% elif log.file_type == 'announcement' %}公告文件
+                                {% else %}{{ log.file_type }}{% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ log.file_size|filesizeformat }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ log.ip_address }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500 truncate max-w-xs">{{ log.user_agent }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">暂无下载记录</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 分页 -->
+        {% if page_obj.has_other_pages %}
+        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4 rounded-lg shadow-lg">
+            <div class="flex-1 flex justify-between items-center">
+                <div>
+                    <p class="text-sm text-gray-700">
+                        显示第 <span class="font-medium">{{ page_obj.start_index }}</span>
+                        到 <span class="font-medium">{{ page_obj.end_index }}</span>
+                        条，共 <span class="font-medium">{{ paginator.count }}</span> 条记录
+                    </p>
+                </div>
+                <div class="flex space-x-2">
+                    {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}{% for key, value in filters.items %}&{{ key }}={{ value }}{% endfor %}"
+                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        上一页
+                    </a>
+                    {% endif %}
+                    
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% for key, value in filters.items %}&{{ key }}={{ value }}{% endfor %}"
+                        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        下一页
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

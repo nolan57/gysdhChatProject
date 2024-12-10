@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ conference.name }} - 参会人员管理{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- 顶部状态栏 -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <a href="{% url 'conference:detail' pk=conference.id %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
+                    <i class="fas fa-arrow-left"></i>
+                    <span class="ml-2">返回会议详情</span>
+                </a>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">参会人员管理</h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- 报名信息 -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">报名信息</h2>
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+                已报名 {{ current_count }}/{{ company_max_participants }} 人
+            </div>
+        </div>
+        
+        {% if spaces_left > 0 %}
+        <div class="mb-4">
+            <a href="{% url 'conference:add_participant' conference_id=conference.id %}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <i class="fas fa-plus mr-2"></i>
+                添加参会人员
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 参会人员列表 -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">参会人员列表</h2>
+        </div>
+        
+        {% if company_registrations %}
+        <div class="divide-y divide-gray-200 dark:divide-gray-700">
+            {% for registration in company_registrations %}
+            <div class="px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ registration.participant.name }}</h3>
+                        <div class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            <p>电话：{{ registration.participant.phone }}</p>
+                            <p>邮箱：{{ registration.participant.email }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full
+                            {% if registration.status == 'pending' %}bg-yellow-100 text-yellow-800
+                            {% else %}bg-green-100 text-green-800{% endif %}">
+                            {{ registration.get_status_display }}
+                        </span>
+                        <form method="post" action="{% url 'conference:remove_participant' registration_id=registration.id %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+            暂无参会人员
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

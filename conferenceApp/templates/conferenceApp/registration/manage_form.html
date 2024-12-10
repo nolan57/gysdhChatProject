@@ -1,0 +1,1498 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap 5 Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 页面标题 -->
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center">
+                <i class="fas fa-clipboard-list text-blue-600 dark:text-blue-400 text-4xl mr-4"></i>
+                <div>
+                    <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">{{ title }}</h1>
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ subtitle }}</p>
+                </div>
+            </div>
+            <a href="{% url 'conference:dashboard' %}" class="flex items-center justify-center space-x-3 p-4 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 transition-colors text-blue-600 dark:text-blue-400">
+                <i class="fas fa-arrow-left text-xl"></i>
+                <span class="text-lg font-medium">返回DASHBOARD</span>
+            </a>
+            <button data-bs-toggle="modal" data-bs-target="#createFormModal"
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 hover:from-blue-700 hover:to-indigo-700 dark:hover:from-blue-600 dark:hover:to-indigo-600 transform hover:scale-105 transition-all duration-200">
+                <i class="fas fa-plus mr-2"></i>
+                创建新表单
+            </button>
+        </div>
+
+        <!-- 表单列表 -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div class="p-6">
+                {% if registration_forms %}
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    <input type="checkbox" id="selectAll" class="rounded border-gray-300 dark:border-gray-600
+                                           text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 
+                                           focus:ring-opacity-50 dark:bg-gray-700 dark:focus:ring-blue-600">
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    表单名称
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    创建时间
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    字段数量
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    状态
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    操作
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            {% for form in registration_forms %}
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                                <td class="px-6 py-4">
+                                    <input type="checkbox" name="form_ids[]" value="{{ form.id }}" 
+                                           class="form-checkbox rounded border-gray-300 dark:border-gray-600
+                                                  text-blue-600 shadow-sm focus:border-blue-300 focus:ring 
+                                                  focus:ring-blue-200 focus:ring-opacity-50 dark:bg-gray-700">
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ form.title }}
+                                    </div>
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        {{ form.description|truncatechars:50 }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                    {{ form.created_at|date:"Y-m-d H:i" }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                        {{ form.fields.count }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    {% if form.is_active %}
+                                    <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full 
+                                               bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                        使用中
+                                    </span>
+                                    {% else %}
+                                    <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full 
+                                               bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                                        未使用
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 space-x-3">
+                                    <button onclick="previewForm({{ form.id }})" 
+                                            class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button onclick="editForm({{ form.id }})" 
+                                            class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="deleteForm({{ form.id }})" 
+                                            class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- 批量操作 -->
+                <div class="mt-6 flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">表单管理</h1>
+                    <div class="flex space-x-4">
+                        <button id="batchDeleteBtn" 
+                                class="hidden px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50">
+                            批量删除
+                        </button>
+                        <a href="{% url 'conference:manage_formio' %}"
+                           class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                            Form.io 表单
+                        </a>
+                        <button data-bs-toggle="modal" data-bs-target="#createFormModal"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            创建新表单
+                        </button>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <div class="text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-clipboard-list text-6xl mb-4"></i>
+                        <p class="text-xl">暂无表单</p>
+                        <p class="mt-2">点击上方的"创建新表单"按钮开始创建</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 创建表单模态框 -->
+<div class="modal fade" id="createFormModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl border-0">
+            <div class="modal-header border-b border-gray-200 dark:border-gray-700">
+                <h5 class="modal-title text-lg font-semibold text-gray-900 dark:text-white">创建新表单</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createFormForm" class="space-y-6" method="POST">
+                    {% csrf_token %}
+                    <div class="space-y-4">
+                        <div>
+                            <label for="formTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">表单标题</label>
+                            <input type="text" id="formTitle" name="name" required
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                          shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
+                                          dark:text-white"
+                                   placeholder="请输入表单标题">
+                        </div>
+                        
+                        <div>
+                            <label for="formDescription" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">表单说明</label>
+                            <textarea id="formDescription" name="description" rows="3"
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                             shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
+                                             dark:text-white"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">表单状态</label>
+                            <div class="flex items-center space-x-4">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="is_active" value="1" checked class="form-radio text-blue-600">
+                                    <span class="ml-2 text-gray-700 dark:text-gray-300">启用</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="is_active" value="0" class="form-radio text-blue-600">
+                                    <span class="ml-2 text-gray-700 dark:text-gray-300">禁用</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="formConference" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">关联会议</label>
+                            <select id="formConference" name="conference_id"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                           shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
+                                           dark:text-white">
+                                <option value="">请选择会议</option>
+                                {% for conference in conferences %}
+                                <option value="{{ conference.id }}">{{ conference.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="formStartTime" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">报名开始时间</label>
+                            <input type="datetime-local" id="formStartTime" name="start_time"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                          shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
+                                          dark:text-white">
+                        </div>
+                        
+                        <div>
+                            <label for="formEndTime" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">报名结束时间</label>
+                            <input type="datetime-local" id="formEndTime" name="end_time"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                          shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
+                                          dark:text-white">
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <input type="checkbox" id="formUseConferenceTime" name="use_conference_time"
+                                   class="form-checkbox rounded border-gray-300 dark:border-gray-600
+                                          text-blue-600 shadow-sm focus:border-blue-300 focus:ring 
+                                          focus:ring-blue-200 focus:ring-opacity-50 dark:bg-gray-700">
+                            <label for="formUseConferenceTime" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                使用会议设定的报名时间
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- 表单字段构建器 -->
+                    <div class="mt-8">
+                        <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2">
+                            表单字段
+                            <button type="button" id="addFieldBtn"
+                                    class="float-right text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                                <i class="fas fa-plus"></i> 添加字段
+                            </button>
+                        </h6>
+                        
+                        <div id="formFields" class="space-y-4 mt-4">
+                            <!-- 字段列表将通过JavaScript动态添加 -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-t border-gray-200 dark:border-gray-700">
+                <button type="button" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 
+                                           bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 
+                                           dark:hover:bg-gray-600 focus:outline-none focus:ring-2 
+                                           focus:ring-offset-2 focus:ring-gray-500" 
+                        data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="createFormForm" 
+                        class="ml-3 inline-flex justify-center px-4 py-2 text-sm font-medium text-white 
+                               bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-500 
+                               dark:to-indigo-500 rounded-md hover:from-blue-700 hover:to-indigo-700 
+                               dark:hover:from-blue-600 dark:hover:to-indigo-600 focus:outline-none 
+                               focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    创建
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 编辑表单模态框 -->
+<div class="modal fade" id="editFormModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl border-0">
+            <div class="modal-header border-b border-gray-200 dark:border-gray-700">
+                <h5 class="modal-title text-lg font-semibold text-gray-900 dark:text-white">编辑表单</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editFormForm" class="space-y-6">
+                    {% csrf_token %}
+                    <input type="hidden" id="editFormId" name="form_id">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- 基本信息 -->
+                        <div class="space-y-4">
+                            <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2">基本信息</h6>
+                            
+                            <div>
+                                <label for="editFormTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">表单标题</label>
+                                <input type="text" id="editFormTitle" name="name" required
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                              shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
+                                              dark:text-white">
+                            </div>
+                            
+                            <div>
+                                <label for="editFormDescription" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">表单说明</label>
+                                <textarea id="editFormDescription" name="description" rows="3"
+                                          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                                 shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
+                                                 dark:text-white"></textarea>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">表单状态</label>
+                                <div class="flex items-center space-x-4">
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="is_active" value="1" class="form-radio text-blue-600">
+                                        <span class="ml-2 text-gray-700 dark:text-gray-300">启用</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="is_active" value="0" class="form-radio text-blue-600">
+                                        <span class="ml-2 text-gray-700 dark:text-gray-300">禁用</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 会议关联 -->
+                        <div class="space-y-4">
+                            <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2">会议关联</h6>
+                            
+                            <div>
+                                <label for="editFormConference" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">关联会议</label>
+                                <select id="editFormConference" name="conference_id"
+                                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                               shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
+                                               dark:text-white">
+                                    <option value="">请选择会议</option>
+                                    {% for conference in conferences %}
+                                    <option value="{{ conference.id }}">{{ conference.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="editFormStartTime" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">报名开始时间</label>
+                                    <input type="datetime-local" id="editFormStartTime" name="start_time"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                                  shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
+                                                  dark:text-white">
+                                </div>
+                                
+                                <div>
+                                    <label for="editFormEndTime" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">报名结束时间</label>
+                                    <input type="datetime-local" id="editFormEndTime" name="end_time"
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                                  shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
+                                                  dark:text-white">
+                                </div>
+                                
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="editFormUseConferenceTime" name="use_conference_time"
+                                           class="form-checkbox rounded border-gray-300 dark:border-gray-600
+                                                  text-blue-600 shadow-sm focus:border-blue-300 focus:ring 
+                                                  focus:ring-blue-200 focus:ring-opacity-50 dark:bg-gray-700">
+                                    <label for="editFormUseConferenceTime" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                        使用会议设定的报名时间
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 表单字段构建器 -->
+                    <div class="mt-8">
+                        <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2">
+                            表单字段
+                            <button type="button" id="addFieldBtn"
+                                    class="float-right text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                                <i class="fas fa-plus"></i> 添加字段
+                            </button>
+                        </h6>
+                        
+                        <div id="formFields" class="space-y-4 mt-4">
+                            <!-- 字段列表将通过JavaScript动态添加 -->
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-t border-gray-200 dark:border-gray-700">
+                <button type="button" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 
+                                           bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 
+                                           dark:hover:bg-gray-600 focus:outline-none focus:ring-2 
+                                           focus:ring-offset-2 focus:ring-gray-500" 
+                        data-bs-dismiss="modal">取消</button>
+                <button type="submit" form="editFormForm" 
+                        class="ml-3 inline-flex justify-center px-4 py-2 text-sm font-medium text-white 
+                               bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-500 
+                               dark:to-indigo-500 rounded-md hover:from-blue-700 hover:to-indigo-700 
+                               dark:hover:from-blue-600 dark:hover:to-indigo-600 focus:outline-none 
+                               focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    保存修改
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 逻辑规则管理模态框 -->
+<div class="modal fade" id="logicRulesModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-white dark:bg-gray-800 rounded-lg shadow-xl border-0">
+            <div class="modal-header border-b border-gray-200 dark:border-gray-700">
+                <h5 class="modal-title text-lg font-semibold text-gray-900 dark:text-white">管理逻辑规则</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- 规则预览区域 -->
+                <div id="rulesPreview" class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">规则预览</h6>
+                    <div id="previewContent" class="space-y-2">
+                        <!-- 预览内容将通过JavaScript动态添加 -->
+                    </div>
+                </div>
+
+                <!-- 规则模板 -->
+                <div class="mb-6">
+                    <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">快速添加规则</h6>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button type="button" class="template-btn" data-template="show_if_equals">
+                            当值相等时显示
+                        </button>
+                        <button type="button" class="template-btn" data-template="hide_if_empty">
+                            当为空时隐藏
+                        </button>
+                        <button type="button" class="template-btn" data-template="require_if_selected">
+                            当选中时必填
+                        </button>
+                        <button type="button" class="template-btn" data-template="set_value_if_greater">
+                            当大于时设置值
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 规则列表 -->
+                <div id="rulesList" class="space-y-4">
+                    <!-- 规则将通过JavaScript动态添加 -->
+                </div>
+
+                <!-- 错误提示区域 -->
+                <div id="errorMessages" class="mt-4 hidden">
+                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+                                    发现以下问题：
+                                </h3>
+                                <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                                    <ul id="errorList" class="list-disc pl-5 space-y-1">
+                                        <!-- 错误信息将通过JavaScript动态添加 -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-t border-gray-200 dark:border-gray-700">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" id="previewRulesBtn" class="btn btn-info">预览规则</button>
+                <button type="button" id="saveRulesBtn" class="btn btn-primary">保存规则</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 全选/取消全选
+    document.getElementById('selectAll').addEventListener('change', function() {
+        document.querySelectorAll('input[name="form_ids[]"]').forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateBatchDeleteButton();
+    });
+
+    // 更新批量删除按钮状态
+    function updateBatchDeleteButton() {
+        const selectedCount = document.querySelectorAll('input[name="form_ids[]"]:checked').length;
+        const batchDeleteBtn = document.getElementById('batchDeleteBtn');
+        batchDeleteBtn.disabled = selectedCount === 0;
+    }
+
+    // 监听复选框变化
+    document.querySelectorAll('input[name="form_ids[]"]').forEach(checkbox => {
+        checkbox.addEventListener('change', updateBatchDeleteButton);
+    });
+
+    // 预览表单
+    function previewForm(formId) {
+        // TODO: 实现表单预览逻辑
+    }
+
+    // 编辑表单
+    function editForm(formId) {
+        // TODO: 实现表单编辑逻辑
+    }
+
+    // 删除表单
+    function deleteForm(formId) {
+        if (confirm('确定要删除这个表单吗？')) {
+            // TODO: 实现表单删除逻辑
+        }
+    }
+
+    // 批量删除
+    document.getElementById('batchDeleteBtn').addEventListener('click', function() {
+        const selectedIds = Array.from(document.querySelectorAll('input[name="form_ids[]"]:checked'))
+                                .map(checkbox => checkbox.value);
+        if (selectedIds.length > 0 && confirm(`确定要删除选中的 ${selectedIds.length} 个表单吗？`)) {
+            // TODO: 实现批量删除逻辑
+        }
+    });
+
+    // 初始化批量删除按钮状态
+    updateBatchDeleteButton();
+    // 编辑表单
+    function editForm(formId) {
+        // 获取表单数据
+        fetch(`/conference/api/registration-form/${formId}/`)
+            .then(response => response.json())
+            .then(data => {
+                // 填充表单数据
+                document.getElementById('editFormId').value = data.id;
+                document.getElementById('editFormTitle').value = data.name;
+                document.getElementById('editFormDescription').value = data.description;
+                document.querySelector(`input[name="is_active"][value="${data.is_active ? 1 : 0}"]`).checked = true;
+                
+                // 设置会议关联
+                const conferenceSelect = document.getElementById('editFormConference');
+                if (data.conference) {
+                    conferenceSelect.value = data.conference.id;
+                    // 如果使用会议时间，则设置并禁用时间输入
+                    if (data.use_conference_time) {
+                        document.getElementById('editFormUseConferenceTime').checked = true;
+                        document.getElementById('editFormStartTime').value = data.conference.registration_start_time;
+                        document.getElementById('editFormEndTime').value = data.conference.registration_end_time;
+                        document.getElementById('editFormStartTime').disabled = true;
+                        document.getElementById('editFormEndTime').disabled = true;
+                    } else {
+                        document.getElementById('editFormStartTime').value = data.start_time;
+                        document.getElementById('editFormEndTime').value = data.end_time;
+                    }
+                }
+                
+                // 显示模态框
+                const modal = new bootstrap.Modal(document.getElementById('editFormModal'));
+                modal.show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('获取表单数据失败');
+            });
+    }
+    
+    // 处理会议时间复选框变化
+    document.getElementById('editFormUseConferenceTime').addEventListener('change', function() {
+        const startTimeInput = document.getElementById('editFormStartTime');
+        const endTimeInput = document.getElementById('editFormEndTime');
+        const conferenceId = document.getElementById('editFormConference').value;
+        
+        if (this.checked && conferenceId) {
+            // 获取会议时间
+            fetch(`/conference/api/conference/${conferenceId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    startTimeInput.value = data.registration_start_time;
+                    endTimeInput.value = data.registration_end_time;
+                    startTimeInput.disabled = true;
+                    endTimeInput.disabled = true;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('获取会议时间失败');
+                    this.checked = false;
+                });
+        } else {
+            startTimeInput.disabled = false;
+            endTimeInput.disabled = false;
+        }
+    });
+    
+    // 处理会议选择变化
+    document.getElementById('editFormConference').addEventListener('change', function() {
+        const useConferenceTime = document.getElementById('editFormUseConferenceTime');
+        if (useConferenceTime.checked) {
+            useConferenceTime.dispatchEvent(new Event('change'));
+        }
+    });
+    
+    // 处理表单提交
+    document.getElementById('editFormForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formId = document.getElementById('editFormId').value;
+        const formData = new FormData(this);
+        
+        // 转换为JSON对象
+        const jsonData = {
+            name: formData.get('name'),
+            description: formData.get('description'),
+            is_active: formData.get('is_active') === '1',
+            conference_id: formData.get('conference_id'),
+            use_conference_time: formData.get('use_conference_time') === 'on',
+            start_time: formData.get('start_time'),
+            end_time: formData.get('end_time')
+        };
+    
+        fetch(`/conference/api/registration-form/${formId}/`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(jsonData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // 关闭模态框并刷新页面
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editFormModal'));
+            modal.hide();
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('保存失败');
+        });
+    });
+    
+    // 处理创建表单提交
+    document.getElementById('createFormForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // 构建提交数据
+        const jsonData = {
+            name: formData.get('name'),
+            description: formData.get('description'),
+            is_active: formData.get('is_active') === '1',
+            conference_id: formData.get('conference_id'),
+            start_time: formData.get('start_time'),
+            end_time: formData.get('end_time'),
+            fields: formFields.map((field, index) => ({
+                field_type: field.type,
+                label: field.label,
+                name: field.name || `field_${index + 1}`,
+                required: field.required,
+                order: field.order,
+                options: field.options.map((option, optIndex) => ({
+                    label: option.label,
+                    value: option.value || option.label,
+                    order: optIndex
+                }))
+            }))
+        };
+
+        // 如果选中了使用会议时间，则不发送时间
+        if (formData.get('use_conference_time') === 'on') {
+            delete jsonData.start_time;
+            delete jsonData.end_time;
+        }
+        delete jsonData.use_conference_time;  // 删除这个字段，因为后端不需要
+
+        console.log('Submitting form data:', jsonData);  // 添加日志
+
+        // 发送请求到后端
+        fetch('{% url "conference:create_registration_form" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': token
+            },
+            body: JSON.stringify(jsonData),
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            console.log('Response status:', response.status);  // 添加日志
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.error || '创建失败');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success response:', data);  // 添加日志
+            const modal = bootstrap.Modal.getInstance(document.getElementById('createFormModal'));
+            modal.hide();
+            // 显示成功消息
+            alert('表单创建成功！');
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('创建失败：' + error.message);
+        });
+    });
+    
+    // 处理创建表单模态框中的会议时间复选框变化
+    document.getElementById('formUseConferenceTime').addEventListener('change', function() {
+        const startTimeInput = document.getElementById('formStartTime');
+        const endTimeInput = document.getElementById('formEndTime');
+        const conferenceId = document.getElementById('formConference').value;
+        
+        if (this.checked && conferenceId) {
+            // 获取会议时间
+            fetch(`/conference/api/conference/${conferenceId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    startTimeInput.value = data.registration_start_time;
+                    endTimeInput.value = data.registration_end_time;
+                    startTimeInput.disabled = true;
+                    endTimeInput.disabled = true;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('获取会议时间失败');
+                    this.checked = false;
+                });
+        } else {
+            startTimeInput.disabled = false;
+            endTimeInput.disabled = false;
+        }
+    });
+
+    // 处理创建表单模态框中的会议选择变化
+    document.getElementById('formConference').addEventListener('change', function() {
+        const useConferenceTime = document.getElementById('formUseConferenceTime');
+        if (useConferenceTime.checked) {
+            useConferenceTime.dispatchEvent(new Event('change'));
+        }
+    });
+
+    // 字段类型定义
+    const FIELD_TYPES = {
+        text: '单行文本',
+        textarea: '多行文本',
+        number: '数字',
+        select: '下拉选择',
+        radio: '单选',
+        checkbox: '多选',
+        date: '日期',
+        time: '时间',
+        file: '文件上传'
+    };
+    
+    // 当前表单字段列表
+    let formFields = [];
+    
+    // 添加新字段
+    function addField() {
+        const fieldId = `field_${Date.now()}`;
+        const field = {
+            id: fieldId,
+            type: 'text',
+            label: '',
+            name: '',
+            required: true,
+            order: formFields.length,
+            options: []
+        };
+        formFields.push(field);
+        renderField(field);
+        console.log('Added field:', field);
+    }
+    
+    // 渲染字段
+    function renderField(field) {
+        const fieldHtml = `
+            <div id="${field.id}" class="field-item border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h6 class="text-sm font-medium text-gray-700 dark:text-gray-300">字段 #${field.order + 1}</h6>
+                    <div class="space-x-2">
+                        <button type="button" onclick="moveField('${field.id}', 'up')"
+                                class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button type="button" onclick="moveField('${field.id}', 'down')"
+                                class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                        <button type="button" onclick="manageLogicRules('${field.id}')"
+                                class="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                            <i class="fas fa-random"></i>
+                        </button>
+                        <button type="button" onclick="deleteField('${field.id}')"
+                                class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">字段类型</label>
+                        <select onchange="updateFieldType('${field.id}', this.value)"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                       shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
+                                       dark:text-white">
+                            ${Object.entries(FIELD_TYPES).map(([value, label]) => 
+                                `<option value="${value}" ${field.type === value ? 'selected' : ''}>${label}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">字段标签</label>
+                        <input type="text" value="${field.label}"
+                               onchange="updateField('${field.id}', 'label', this.value)"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                      shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
+                                      dark:text-white">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">字段名称</label>
+                        <input type="text" value="${field.name}"
+                               onchange="updateField('${field.id}', 'name', this.value)"
+                               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                      shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
+                                      dark:text-white">
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" ${field.required ? 'checked' : ''}
+                               onchange="updateField('${field.id}', 'required', this.checked)"
+                               class="form-checkbox rounded border-gray-300 dark:border-gray-600
+                                      text-blue-600 shadow-sm focus:border-blue-300 focus:ring 
+                                      focus:ring-blue-200 focus:ring-opacity-50 dark:bg-gray-700">
+                        <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">必填字段</label>
+                    </div>
+                </div>
+                
+                ${['select', 'radio', 'checkbox'].includes(field.type) ? `
+                    <div class="mt-4" id="options_${field.id}">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">选项列表</label>
+                        <div class="space-y-2">
+                            ${field.options.map((option, index) => `
+                                <div class="flex items-center space-x-2">
+                                    <input type="text" value="${option.label}"
+                                           onchange="updateOption('${field.id}', ${index}, 'label', this.value)"
+                                           placeholder="选项标签"
+                                           class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                                  shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
+                                                  dark:text-white">
+                                    <input type="text" value="${option.value}"
+                                           onchange="updateOption('${field.id}', ${index}, 'value', this.value)"
+                                           placeholder="选项值"
+                                           class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                                                  shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 
+                                                  dark:text-white">
+                                    <button type="button" onclick="deleteOption('${field.id}', ${index})"
+                                            class="text-red-500 hover:text-red-700">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button type="button" onclick="addOption('${field.id}')"
+                                class="mt-2 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                            <i class="fas fa-plus"></i> 添加选项
+                        </button>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+        
+        const fieldsContainer = document.getElementById('formFields');
+        if (field.order === formFields.length - 1) {
+            fieldsContainer.insertAdjacentHTML('beforeend', fieldHtml);
+        } else {
+            const fieldElements = fieldsContainer.children;
+            fieldElements[field.order].insertAdjacentHTML('beforebegin', fieldHtml);
+        }
+    }
+    
+    // 更新字段属性
+    function updateField(fieldId, property, value) {
+        const field = formFields.find(f => f.id === fieldId);
+        if (field) {
+            field[property] = value;
+        }
+    }
+    
+    // 更新字段类型
+    function updateFieldType(fieldId, type) {
+        const field = formFields.find(f => f.id === fieldId);
+        if (field) {
+            field.type = type;
+            // 如果切换到选项类型字段，初始化选项
+            if (['select', 'radio', 'checkbox'].includes(type) && !field.options.length) {
+                field.options = [{label: '选项1', value: 'option1'}];
+            }
+            // 重新渲染字段
+            document.getElementById(fieldId).remove();
+            renderField(field);
+        }
+    }
+    
+    // 添加选项
+    function addOption(fieldId) {
+        const field = formFields.find(f => f.id === fieldId);
+        if (field) {
+            field.options.push({
+                label: `选项${field.options.length + 1}`,
+                value: `option${field.options.length + 1}`
+            });
+            document.getElementById(fieldId).remove();
+            renderField(field);
+        }
+    }
+    
+    // 更新选项
+    function updateOption(fieldId, optionIndex, property, value) {
+        const field = formFields.find(f => f.id === fieldId);
+        if (field && field.options[optionIndex]) {
+            field.options[optionIndex][property] = value;
+        }
+    }
+    
+    // 删除选项
+    function deleteOption(fieldId, optionIndex) {
+        const field = formFields.find(f => f.id === fieldId);
+        if (field) {
+            field.options.splice(optionIndex, 1);
+            document.getElementById(fieldId).remove();
+            renderField(field);
+        }
+    }
+    
+    // 移动字段位置
+    function moveField(fieldId, direction) {
+        const fieldIndex = formFields.findIndex(f => f.id === fieldId);
+        if (fieldIndex === -1) return;
+        
+        if (direction === 'up' && fieldIndex > 0) {
+            // 向上移动
+            [formFields[fieldIndex - 1], formFields[fieldIndex]] = 
+            [formFields[fieldIndex], formFields[fieldIndex - 1]];
+        } else if (direction === 'down' && fieldIndex < formFields.length - 1) {
+            // 向下移动
+            [formFields[fieldIndex], formFields[fieldIndex + 1]] = 
+            [formFields[fieldIndex + 1], formFields[fieldIndex]];
+        } else {
+            return;
+        }
+        
+        // 更新排序
+        formFields.forEach((field, index) => field.order = index);
+        
+        // 重新渲染所有字段
+        const fieldsContainer = document.getElementById('formFields');
+        fieldsContainer.innerHTML = '';
+        formFields.forEach(field => renderField(field));
+    }
+    
+    // 删除字段
+    function deleteField(fieldId) {
+        const fieldIndex = formFields.findIndex(f => f.id === fieldId);
+        if (fieldIndex !== -1) {
+            formFields.splice(fieldIndex, 1);
+            // 更新排序
+            formFields.forEach((field, index) => field.order = index);
+            // 移除DOM元素
+            document.getElementById(fieldId).remove();
+        }
+    }
+    
+    // 绑定添加字段按钮事件
+    document.getElementById('addFieldBtn').addEventListener('click', addField);
+    
+    // 处理表单提交
+    document.getElementById('createFormForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        // 构建提交数据
+        const jsonData = {
+            name: formData.get('name'),
+            description: formData.get('description'),
+            is_active: formData.get('is_active') === '1',
+            conference_id: formData.get('conference_id'),
+            start_time: formData.get('start_time'),
+            end_time: formData.get('end_time'),
+            fields: formFields.map((field, index) => ({
+                field_type: field.type,
+                label: field.label,
+                name: field.name || `field_${index + 1}`,
+                required: field.required,
+                order: index + 1,
+                options: field.options.map((option, optIndex) => ({
+                    label: option.label,
+                    value: option.value || option.label,
+                    order: optIndex + 1
+                }))
+            }))
+        };
+
+        // 如果选中了使用会议时间，则不发送时间
+        if (formData.get('use_conference_time') === 'on') {
+            delete jsonData.start_time;
+            delete jsonData.end_time;
+        }
+        delete jsonData.use_conference_time;  // 删除这个字段，因为后端不需要
+
+        console.log('Submitting form data:', jsonData);  // 添加日志
+
+        // 发送请求到后端
+        fetch('{% url "conference:create_registration_form" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': token
+            },
+            body: JSON.stringify(jsonData),
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            console.log('Response status:', response.status);  // 添加日志
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.error || '创建失败');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success response:', data);  // 添加日志
+            const modal = bootstrap.Modal.getInstance(document.getElementById('createFormModal'));
+            modal.hide();
+            // 显示成功消息
+            alert('表单创建成功！');
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('创建失败：' + error.message);
+        });
+    });
+    
+    // 编辑表单时加载字段
+    function loadFormFields(formId) {
+        fetch(`/conference/api/forms/${formId}/fields/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 清空现有字段
+                    const fieldsContainer = document.getElementById('editFormFieldsContainer');
+                    fieldsContainer.innerHTML = '';
+                    formFields = data.fields;
+                    
+                    // 加载字段及其逻辑规则
+                    formFields.forEach(field => {
+                        renderField(field);
+                        // 加载字段的逻辑规则
+                        fetch(`/conference/api/forms/${formId}/fields/${field.id}/rules/`)
+                            .then(response => response.json())
+                            .then(rulesData => {
+                                if (rulesData.success) {
+                                    logicRules[field.id] = rulesData.rules;
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error loading rules:', error);
+                            });
+                    });
+                } else {
+                    alert('加载字段失败：' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('加载字段失败，请稍后重试');
+            });
+    }
+    
+    // 处理逻辑规则管理按钮点击事件
+    function manageLogicRules(fieldId) {
+        // TODO: 实现逻辑规则管理逻辑
+        alert('逻辑规则管理');
+    }
+    // 定义全局变量存储逻辑规则
+    let logicRules = {};
+    let currentFieldId = null;
+    
+    // 支持的操作符
+    const OPERATORS = {
+        equals: '等于',
+        not_equals: '不等于',
+        contains: '包含',
+        not_contains: '不包含',
+        greater_than: '大于',
+        less_than: '小于',
+        in: '在列表中',
+        not_in: '不在列表中',
+        starts_with: '开头是',
+        ends_with: '结尾是',
+        is_empty: '为空',
+        is_not_empty: '不为空',
+        between: '在范围内'
+    };
+    
+    // 支持的动作
+    const ACTIONS = {
+        show: '显示',
+        hide: '隐藏',
+        enable: '启用',
+        disable: '禁用',
+        require: '必填',
+        unrequire: '非必填',
+        set_value: '设置值',
+        clear_value: '清除值'
+    };
+    
+    // 处理逻辑规则管理按钮点击事件
+    function manageLogicRules(fieldId) {
+        currentFieldId = fieldId;
+        const field = formFields.find(f => f.id === fieldId);
+        
+        // 显示当前字段信息
+        document.getElementById('currentFieldInfo').textContent = 
+            `${field.label} (${field.type})`;
+        
+        // 初始化规则列表
+        if (!logicRules[fieldId]) {
+            logicRules[fieldId] = [];
+        }
+        
+        // 渲染规则列表
+        renderRules();
+        
+        // 显示模态框
+        const modal = new bootstrap.Modal(document.getElementById('logicRulesModal'));
+        modal.show();
+    }
+    
+    // 渲染规则列表
+    function renderRules() {
+        const rulesContainer = document.getElementById('rulesList');
+        rulesContainer.innerHTML = '';
+        
+        if (logicRules[currentFieldId].length === 0) {
+            rulesContainer.innerHTML = `
+                <div class="text-center text-gray-500 dark:text-gray-400 py-4">
+                    暂无规则，点击"添加规则"按钮创建新规则
+                </div>
+            `;
+            return;
+        }
+        
+        logicRules[currentFieldId].forEach((rule, index) => {
+            const ruleElement = createRuleElement(rule, index);
+            rulesContainer.appendChild(ruleElement);
+        });
+    }
+    
+    // 创建规则元素
+    function createRuleElement(rule, index) {
+        const div = document.createElement('div');
+        div.className = 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4';
+        
+        const targetField = formFields.find(f => f.id === rule.targetFieldId);
+        
+        div.innerHTML = `
+            <div class="flex justify-between items-start">
+                <div class="space-y-2 flex-grow">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            如果 ${targetField ? targetField.label : '未知字段'}
+                        </span>
+                        <select class="operator-select text-sm border-gray-300 dark:border-gray-600 rounded-md">
+                            ${Object.entries(OPERATORS).map(([key, label]) => 
+                                `<option value="${key}" ${rule.operator === key ? 'selected' : ''}>${label}</option>`
+                            ).join('')}
+                        </select>
+                        <input type="text" class="value-input flex-grow text-sm border-gray-300 dark:border-gray-600 rounded-md"
+                               value="${rule.value || ''}" ${rule.operator === 'is_empty' || rule.operator === 'is_not_empty' ? 'disabled' : ''}>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">则</span>
+                        <select class="action-select text-sm border-gray-300 dark:border-gray-600 rounded-md">
+                            ${Object.entries(ACTIONS).map(([key, label]) => 
+                                `<option value="${key}" ${rule.action === key ? 'selected' : ''}>${label}</option>`
+                            ).join('')}
+                        </select>
+                        <input type="text" class="action-value-input flex-grow text-sm border-gray-300 dark:border-gray-600 rounded-md"
+                               value="${rule.actionValue || ''}" ${rule.action === 'set_value' ? '' : 'disabled'}>
+                    </div>
+                </div>
+                <button type="button" onclick="deleteRule(${index})"
+                        class="ml-4 text-red-600 hover:text-red-700 focus:outline-none">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        `;
+        
+        // 添加事件监听器
+        const operatorSelect = div.querySelector('.operator-select');
+        const valueInput = div.querySelector('.value-input');
+        const actionSelect = div.querySelector('.action-select');
+        const actionValueInput = div.querySelector('.action-value-input');
+        
+        operatorSelect.addEventListener('change', (e) => {
+            const isNoValueOperator = e.target.value === 'is_empty' || e.target.value === 'is_not_empty';
+            valueInput.disabled = isNoValueOperator;
+            if (isNoValueOperator) valueInput.value = '';
+            updateRule(index, 'operator', e.target.value);
+        });
+        
+        valueInput.addEventListener('input', (e) => {
+            updateRule(index, 'value', e.target.value);
+        });
+        
+        actionSelect.addEventListener('change', (e) => {
+            const isSetValueAction = e.target.value === 'set_value';
+            actionValueInput.disabled = !isSetValueAction;
+            if (!isSetValueAction) actionValueInput.value = '';
+            updateRule(index, 'action', e.target.value);
+        });
+        
+        actionValueInput.addEventListener('input', (e) => {
+            updateRule(index, 'actionValue', e.target.value);
+        });
+        
+        return div;
+    }
+    
+    // 添加新规则
+    function addRule() {
+        const availableFields = formFields.filter(f => f.id !== currentFieldId);
+        if (availableFields.length === 0) {
+            alert('没有可用的目标字段');
+            return;
+        }
+        
+        const newRule = {
+            targetFieldId: availableFields[0].id,
+            operator: 'equals',
+            value: '',
+            action: 'show',
+            actionValue: ''
+        };
+        
+        logicRules[currentFieldId].push(newRule);
+        renderRules();
+    }
+    
+    // 更新规则
+    function updateRule(index, property, value) {
+        logicRules[currentFieldId][index][property] = value;
+    }
+    
+    // 删除规则
+    function deleteRule(index) {
+        if (confirm('确定要删除这条规则吗？')) {
+            logicRules[currentFieldId].splice(index, 1);
+            renderRules();
+        }
+    }
+    
+    // 保存规则
+    function saveRules() {
+        const formId = document.getElementById('editFormId').value;
+        const rules = logicRules[currentFieldId];
+        
+        fetch(`/conference/api/forms/${formId}/fields/${currentFieldId}/rules/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(rules)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('logicRulesModal'));
+                modal.hide();
+                // 显示成功消息
+                showSuccess('逻辑规则保存成功！');
+            } else {
+                alert('保存失败：' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('保存失败，请稍后重试');
+        });
+    }
+    
+    // 定义规则模板
+    const ruleTemplates = {
+        show_if_equals: {
+            operator: 'equals',
+            action: 'show',
+            value: '',
+            action_value: ''
+        },
+        hide_if_empty: {
+            operator: 'is_empty',
+            action: 'hide',
+            value: '',
+            action_value: ''
+        },
+        require_if_selected: {
+            operator: 'equals',
+            action: 'require',
+            value: 'true',
+            action_value: ''
+        },
+        set_value_if_greater: {
+            operator: 'greater_than',
+            action: 'set_value',
+            value: '',
+            action_value: ''
+        }
+    };
+
+    // 处理规则模板按钮点击
+    document.querySelectorAll('.template-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const template = ruleTemplates[btn.dataset.template];
+            if (template) {
+                addRuleFromTemplate(template);
+            }
+        });
+    });
+
+    // 从模板添加规则
+    function addRuleFromTemplate(template) {
+        const availableFields = formFields.filter(f => f.id !== currentFieldId);
+        if (availableFields.length === 0) {
+            alert('没有可用的目标字段');
+            return;
+        }
+        
+        const newRule = {
+            targetFieldId: availableFields[0].id,
+            ...template
+        };
+
+        logicRules[currentFieldId].push(newRule);
+        renderRules();
+    }
+
+    // 显示错误信息
+    function showError(message) {
+        const errorMessages = document.getElementById('errorMessages');
+        const errorList = document.getElementById('errorList');
+        
+        // 清空现有错误信息
+        errorList.innerHTML = '';
+        
+        // 添加新的错误信息
+        if (Array.isArray(message)) {
+            message.forEach(msg => {
+                const li = document.createElement('li');
+                li.textContent = msg;
+                errorList.appendChild(li);
+            });
+        } else {
+            const li = document.createElement('li');
+            li.textContent = message;
+            errorList.appendChild(li);
+        }
+        
+        // 显示错误区域
+        errorMessages.classList.remove('hidden');
+        
+        // 5秒后自动隐藏
+        setTimeout(() => {
+            errorMessages.classList.add('hidden');
+        }, 5000);
+    }
+
+    // 更新规则预览
+    function updatePreview() {
+        const previewContent = document.getElementById('previewContent');
+        const formId = document.getElementById('editFormId').value;
+        
+        fetch(`/conference/api/forms/${formId}/fields/${currentFieldId}/rules/preview/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    previewContent.innerHTML = '';
+                    data.preview.forEach(rule => {
+                        const div = document.createElement('div');
+                        div.className = 'text-sm text-gray-600 dark:text-gray-400';
+                        div.textContent = rule.description;
+                        previewContent.appendChild(div);
+                    });
+                } else {
+                    showError(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('获取规则预览失败');
+            });
+    }
+
+    // 修改保存规则函数
+    function saveRules() {
+        const formId = document.getElementById('editFormId').value;
+        const rules = logicRules[currentFieldId];
+        
+        fetch(`/conference/api/forms/${formId}/fields/${currentFieldId}/rules/save/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(rules)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('logicRulesModal'));
+                modal.hide();
+                // 显示成功消息
+                showSuccess('逻辑规则保存成功！');
+            } else {
+                if (data.errors) {
+                    // 显示具体的验证错误
+                    const errorMessages = data.errors.map(error => 
+                        `字段 ${getFieldLabel(error.target_field_id)}: ${error.error}`
+                    );
+                    showError(errorMessages);
+                } else {
+                    showError(data.error || '保存失败');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('保存失败，请稍后重试');
+        });
+    }
+
+    // 显示成功消息
+    function showSuccess(message) {
+        // 使用 Toast 或其他通知组件显示成功消息
+        // 这里使用简单的 alert 作为示例
+        alert(message);
+    }
+
+    // 获取字段标签
+    function getFieldLabel(fieldId) {
+        const field = formFields.find(f => f.id === fieldId);
+        return field ? field.label : fieldId;
+    }
+
+    // 绑定预览按钮事件
+    document.getElementById('previewRulesBtn').addEventListener('click', updatePreview);
+
+    // 在打开模态框时自动更新预览
+    document.getElementById('logicRulesModal').addEventListener('shown.bs.modal', updatePreview);
+});
+</script>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+    // 获取CSRF Token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

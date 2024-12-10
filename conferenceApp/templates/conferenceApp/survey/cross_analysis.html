@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}交叉分析 - {{ survey.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 页面标题 -->
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center space-x-4">
+                <a href="{% url 'conference:survey_analysis' survey.id %}" class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+                    <i class="fas fa-arrow-left"></i>
+                    <span class="ml-2">返回基础分析</span>
+                </a>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+                    {{ survey.title }} - 交叉分析
+                </h1>
+            </div>
+        </div>
+
+        <!-- 维度选择 -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+            <form method="get" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="dim1" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            维度1
+                        </label>
+                        <select name="dim1" id="dim1" required
+                                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            <option value="">请选择问题</option>
+                            {% for key, comp in components.items %}
+                            <option value="{{ key }}" {% if key == selected_dim1 %}selected{% endif %}>
+                                {{ comp.label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="dim2" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            维度2
+                        </label>
+                        <select name="dim2" id="dim2" required
+                                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            <option value="">请选择问题</option>
+                            {% for key, comp in components.items %}
+                            <option value="{{ key }}" {% if key == selected_dim2 %}selected{% endif %}>
+                                {{ comp.label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="submit"
+                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        分析
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {% if cross_analysis %}
+        <!-- 交叉分析结果 -->
+        <div class="space-y-8">
+            <!-- 热力图 -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+                    交叉分析热力图
+                </h3>
+                <div class="relative" style="height: 400px;">
+                    <canvas id="heatmapChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 详细数据表格 -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                        详细数据
+                    </h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-900 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    {{ cross_analysis.dim1_label }}
+                                </th>
+                                {% for val2 in cross_analysis.options2 %}
+                                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-900 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    {{ val2 }}
+                                </th>
+                                {% endfor %}
+                                <th class="px-6 py-3 bg-gray-50 dark:bg-gray-900 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    总计
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            {% for val1 in cross_analysis.options1 %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {{ val1 }}
+                                </td>
+                                {% for val2 in cross_analysis.options2 %}
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500 dark:text-gray-400">
+                                    {{ cross_analysis.matrix|get:val1|get:val2|default:"0" }}
+                                    <span class="text-xs text-gray-400 dark:text-gray-500">
+                                        ({{ cross_analysis.percentages.cross|get:val1|get:val2|default:"0"|floatformat:1 }}%)
+                                    </span>
+                                </td>
+                                {% endfor %}
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900 dark:text-gray-100">
+                                    {{ cross_analysis.totals_dim1|get:val1 }}
+                                    <span class="text-xs text-gray-400 dark:text-gray-500">
+                                        ({{ cross_analysis.percentages.dim1|get:val1|floatformat:1 }}%)
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <tr class="bg-gray-50 dark:bg-gray-900">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    总计
+                                </td>
+                                {% for val2 in cross_analysis.options2 %}
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900 dark:text-gray-100">
+                                    {{ cross_analysis.totals_dim2|get:val2 }}
+                                    <span class="text-xs text-gray-400 dark:text-gray-500">
+                                        ({{ cross_analysis.percentages.dim2|get:val2|floatformat:1 }}%)
+                                    </span>
+                                </td>
+                                {% endfor %}
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900 dark:text-gray-100">
+                                    {{ survey.responses.count }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+{% if cross_analysis %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 设置Chart.js默认配置
+    Chart.defaults.color = document.documentElement.classList.contains('dark') ? '#9ca3af' : '#4b5563';
+    Chart.defaults.borderColor = document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb';
+    
+    // 准备热力图数据
+    const options1 = {{ cross_analysis.options1|safe }};
+    const options2 = {{ cross_analysis.options2|safe }};
+    const matrix = {{ cross_analysis.matrix|safe }};
+    const data = [];
+    
+    for (let i = 0; i < options1.length; i++) {
+        for (let j = 0; j < options2.length; j++) {
+            const val1 = options1[i];
+            const val2 = options2[j];
+            data.push({
+                x: val2,
+                y: val1,
+                v: (matrix[val1] && matrix[val1][val2]) || 0
+            });
+        }
+    }
+    
+    // 创建热力图
+    const ctx = document.getElementById('heatmapChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                data: data,
+                backgroundColor: function(context) {
+                    const value = context.raw.v;
+                    const alpha = Math.min(0.2 + value / 10, 0.8);
+                    return `rgba(99, 102, 241, ${alpha})`;
+                }
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    type: 'category',
+                    position: 'bottom',
+                    title: {
+                        display: true,
+                        text: '{{ cross_analysis.dim2_label }}'
+                    }
+                },
+                y: {
+                    type: 'category',
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: '{{ cross_analysis.dim1_label }}'
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const data = context.raw;
+                            return `${data.y} - ${data.x}: ${data.v}`;
+                        }
+                    }
+                },
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

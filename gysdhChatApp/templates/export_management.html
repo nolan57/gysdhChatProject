@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}数据导出 - GYSDH CHAT{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-green-50 via-teal-50 to-emerald-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 页面标题 -->
+        <div class="flex items-center mb-8">
+            <i class="fas fa-file-export text-green-600 dark:text-green-400 text-4xl mr-4"></i>
+            <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-teal-600 dark:from-green-400 dark:to-teal-400">数据导出</h1>
+        </div>
+
+        <!-- 导出卡片网格 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- 用户数据导出卡片 -->
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg border-t-4 border-green-500 dark:border-green-400 hover:shadow-xl transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0 bg-gradient-to-r from-green-500 to-teal-500 dark:from-green-400 dark:to-teal-400 rounded-md p-3">
+                            <i class="fas fa-users text-white text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">用户数据导出</h3>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">导出所有用户的基本信息和权限设置</p>
+                        </div>
+                    </div>
+                    <div>
+                        <a href="{% url 'export_users' %}" 
+                           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 dark:bg-green-500 hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-green-400 transition-colors duration-200">
+                            <i class="fas fa-download mr-2"></i>
+                            导出用户数据
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 聊天记录导出卡片 -->
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg border-t-4 border-teal-500 dark:border-teal-400 hover:shadow-xl transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0 bg-gradient-to-r from-teal-500 to-cyan-500 dark:from-teal-400 dark:to-cyan-400 rounded-md p-3">
+                            <i class="fas fa-comments text-white text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">聊天记录导出</h3>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">按日期范围导出聊天记录</p>
+                        </div>
+                    </div>
+                    <form action="{% url 'export_messages' %}" method="get">
+                        <div class="grid grid-cols-2 gap-4 mb-2">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">开始日期</label>
+                                <input type="date" name="start_date" required max="{{ today|date:'Y-m-d' }}"
+                                       class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-teal-500 dark:focus:border-teal-400 focus:ring-teal-500 dark:focus:ring-teal-400 dark:bg-gray-700 dark:text-gray-300">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">结束日期</label>
+                                <input type="date" name="end_date" required max="{{ today|date:'Y-m-d' }}"
+                                       class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-teal-500 dark:focus:border-teal-400 focus:ring-teal-500 dark:focus:ring-teal-400 dark:bg-gray-700 dark:text-gray-300">
+                            </div>
+                        </div>
+                        <button type="submit" 
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-teal-600 dark:bg-teal-500 hover:bg-teal-700 dark:hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 dark:focus:ring-teal-400 transition-colors duration-200">
+                            <i class="fas fa-download mr-2"></i>
+                            导出聊天记录
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 公告导出卡片 -->
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg border-t-4 border-emerald-500 dark:border-emerald-400 hover:shadow-xl transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0 bg-gradient-to-r from-emerald-500 to-green-500 dark:from-emerald-400 dark:to-green-400 rounded-md p-3">
+                            <i class="fas fa-bullhorn text-white text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">公告导出</h3>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">按日期范围导出系统公告</p>
+                        </div>
+                    </div>
+                    <form action="{% url 'export_announcements' %}" method="get">
+                        <div class="grid grid-cols-2 gap-4 mb-2">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">开始日期</label>
+                                <input type="date" name="start_date" required max="{{ today|date:'Y-m-d' }}"
+                                       class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-emerald-500 dark:focus:ring-emerald-400 dark:bg-gray-700 dark:text-gray-300">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">结束日期</label>
+                                <input type="date" name="end_date" required max="{{ today|date:'Y-m-d' }}"
+                                       class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-emerald-500 dark:focus:ring-emerald-400 dark:bg-gray-700 dark:text-gray-300">
+                            </div>
+                        </div>
+                        <button type="submit" 
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 dark:bg-emerald-500 hover:bg-emerald-700 dark:hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 transition-colors duration-200">
+                            <i class="fas fa-download mr-2"></i>
+                            导出公告记录
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 返回按钮 -->
+        <div class="mt-8 flex justify-center">
+            <a href="{% url 'system_management' %}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-green-600 to-teal-600 dark:from-green-500 dark:to-teal-500 hover:from-green-700 hover:to-teal-700 dark:hover:from-green-600 dark:hover:to-teal-600 transform hover:scale-105 transition-all duration-200">
+                <i class="fas fa-arrow-left mr-2"></i>
+                返回系统管理
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

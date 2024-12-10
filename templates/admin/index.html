@@ -1,0 +1,236 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <title>{% translate 'Site administration' %}</title>
+    <link rel="stylesheet" href="{% static 'admin/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/nav_sidebar.css' %}">
+    <script src="{% static 'admin/js/nav_sidebar.js' %}" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --primary: #10B981;
+            --secondary: #059669;
+            --accent: #047857;
+            --primary-fg: #fff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f3f4f6;
+            color: #1a202c;
+        }
+
+        #header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: var(--primary-fg);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #branding h1 {
+            margin: 0;
+            font-weight: 500;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        #content {
+            padding: 2rem;
+        }
+
+        #content-main {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .admin-header h1 {
+            margin: 0;
+            font-size: 1.875rem;
+            color: #1a202c;
+            font-weight: 500;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white !important;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .back-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(to right, var(--secondary), var(--accent));
+        }
+
+        .back-button i {
+            margin-right: 0.5rem;
+        }
+
+        /* 美化应用列表样式 */
+        .app-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+            list-style: none !important;
+        }
+
+        .app-item {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .app-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-item h2 {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.25rem;
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .model-list {
+            list-style: none !important;
+            padding: 1.25rem !important;
+            margin: 0 !important;
+        }
+
+        .model-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .model-list li:last-child {
+            border-bottom: none;
+        }
+
+        .model-list a {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: #4a5568 !important;
+            transition: color 0.2s;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+        }
+
+        .model-list a:hover {
+            color: var(--primary) !important;
+            background-color: #f7fafc;
+        }
+
+        .model-count {
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Dark mode */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1a202c;
+                color: #e2e8f0;
+            }
+
+            .admin-header h1 {
+                color: #e2e8f0;
+            }
+
+            .app-item {
+                background: #2d3748;
+            }
+
+            .model-list li {
+                border-bottom-color: #4a5568;
+            }
+
+            .model-list a {
+                color: #e2e8f0 !important;
+            }
+
+            .model-list a:hover {
+                color: #34D399 !important;
+                background-color: #2d3748;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <div id="branding">
+            <h1>Django 管理</h1>
+        </div>
+    </div>
+
+    <div id="content">
+        <div id="content-main">
+            <div class="admin-header">
+                <h1>{% translate 'Site administration' %}</h1>
+                <a href="{% url 'conference:dashboard' %}" class="back-button">
+                    <i class="fas fa-arrow-left"></i>
+                    返回DASHBOARD
+                </a>
+            </div>
+
+            {% if app_list %}
+            <div class="app-list">
+                {% for app in app_list %}
+                <div class="app-item">
+                    <h2>{{ app.name }}</h2>
+                    <ul class="model-list">
+                        {% for model in app.models %}
+                        <li>
+                            {% if model.admin_url %}
+                            <a href="{{ model.admin_url }}">
+                                {{ model.name }}
+                                {% if model.count is not None %}
+                                <span class="model-count">{{ model.count }}</span>
+                                {% endif %}
+                            </a>
+                            {% else %}
+                            {{ model.name }}
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>{% translate "You don't have permission to view or edit anything." %}</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

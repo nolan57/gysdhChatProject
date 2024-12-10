@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <!-- 顶部导航栏 -->
+    <nav class="bg-white dark:bg-gray-800 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">会议列表</h2>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'logout' %}" 
+                       class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
+                        <i class="fas fa-sign-out-alt mr-2"></i>退出
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- 会议列表 -->
+        <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+            {% if conferences %}
+            <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                {% for conference in conferences %}
+                <li class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1 min-w-0">
+                            <a href="{% url 'conference:detail' conference.pk %}" 
+                               class="block focus:outline-none">
+                                <div class="flex items-center justify-between">
+                                    <p class="text-lg font-medium text-gray-900 dark:text-white truncate">
+                                        {{ conference.name }}
+                                    </p>
+                                    <div class="ml-2">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                            {% if conference.status == 'draft' %}bg-gray-100 text-gray-800
+                                            {% elif conference.status == 'published' %}bg-blue-100 text-blue-800
+                                            {% elif conference.status == 'registration' %}bg-green-100 text-green-800
+                                            {% elif conference.status == 'registration_ended' %}bg-yellow-100 text-yellow-800
+                                            {% elif conference.status == 'check_in' %}bg-purple-100 text-purple-800
+                                            {% elif conference.status == 'in_progress' %}bg-indigo-100 text-indigo-800
+                                            {% elif conference.status == 'completed' %}bg-gray-100 text-gray-800
+                                            {% else %}bg-red-100 text-red-800{% endif %}">
+                                            {{ conference.get_status_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        {{ conference.description|truncatechars:100 }}
+                                    </p>
+                                    <div class="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                        <i class="far fa-calendar mr-1"></i>
+                                        <span>{{ conference.start_date|date:"Y-m-d H:i" }} - {{ conference.end_date|date:"Y-m-d H:i" }}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="text-center py-12">
+                <p class="text-gray-500 dark:text-gray-400">暂无会议</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

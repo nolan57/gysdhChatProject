@@ -1,0 +1,66 @@
+<!-- 左侧边栏 -->
+<div class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-screen overflow-hidden shadow-lg">
+    <!-- 标题区域 -->
+    <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 bg-gradient-to-r from-blue-600 to-blue-700">
+        <h1 class="text-xl font-bold text-white flex items-center">
+            <i class="fas fa-comments mr-2"></i>
+            {{ settings.chat_title|default:"GYSDH CHAT" }}
+        </h1>
+    </div>
+    
+    <!-- 用户信息 -->
+    <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0 bg-gray-50 dark:bg-gray-800">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white flex items-center justify-center shadow-md">
+                <span class="text-lg font-semibold">{{ request.user.name|first|upper }}</span>
+            </div>
+            <div>
+                <p class="font-medium text-gray-800 dark:text-white">{{ request.user.name }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+                    <span class="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+                    在线
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 返回和退出按钮 -->
+    <div class="mt-auto p-4 space-y-3">
+        <a href="{% url 'conference:dashboard' %}" class="flex items-center justify-center space-x-3 p-4 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 transition-colors text-blue-600 dark:text-blue-400">
+            <i class="fas fa-arrow-left text-xl"></i>
+            <span class="text-lg font-medium">返回主页</span>
+        </a>
+        <a href="{% url 'logout' %}" class="flex items-center justify-center space-x-3 p-4 rounded-lg bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 transition-colors text-red-600 dark:text-red-400">
+            <i class="fas fa-sign-out-alt text-xl"></i>
+            <span class="text-lg font-medium">退出登录</span>
+        </a>
+    </div>
+
+    <!-- 注意事项区域 -->
+    <div class="mt-auto p-6 border-t border-gray-200 dark:border-gray-700 bg-yellow-50 dark:bg-yellow-900/20 min-h-[200px] flex flex-col">
+        <div class="flex items-center space-x-2 text-yellow-800 dark:text-yellow-400 mb-4">
+            <i class="fas fa-exclamation-circle text-lg"></i>
+            <h3 class="font-medium text-lg">注意事项</h3>
+        </div>
+        {% if active_notice %}
+            <div class="text-sm text-yellow-700 dark:text-yellow-300 flex-1 prose prose-sm max-w-none dark:prose-invert prose-headings:text-yellow-800 dark:prose-headings:text-yellow-300 prose-a:text-yellow-600 dark:prose-a:text-yellow-400 overflow-y-auto">
+                {{ active_notice.content|safe }}
+            </div>
+            <div class="mt-4 text-xs text-yellow-600 dark:text-yellow-400 flex items-center justify-between border-t border-yellow-200 dark:border-yellow-700 pt-4">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center text-white shadow-sm">
+                        <i class="fas fa-bell text-sm"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-medium">{{ active_notice.publisher.name }}</span>
+                        <span class="text-yellow-500 dark:text-yellow-400">{{ active_notice.timestamp|date:"Y-m-d H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-sm text-yellow-700 dark:text-yellow-300 flex-1 flex items-center justify-center">
+                <p class="text-center">暂无注意事项</p>
+            </div>
+        {% endif %}
+    </div>
+</div>

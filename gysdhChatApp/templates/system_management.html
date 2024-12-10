@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}系统管理 - GYSDH CHAT{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 页面标题 -->
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center">
+                <i class="fas fa-cogs text-green-600 dark:text-green-400 text-4xl mr-4"></i>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-cyan-600 dark:from-green-400 dark:to-cyan-400">系统管理</h1>
+            </div>
+            <div class="flex space-x-4">
+                <a href="/admin/" 
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-500 dark:to-indigo-500 hover:from-purple-700 hover:to-indigo-700 dark:hover:from-purple-600 dark:hover:to-indigo-600 transform hover:scale-105 transition-all duration-200">
+                    <i class="fas fa-user-shield mr-2"></i>
+                    后台管理
+                </a>
+                <a href="{% url 'conference:dashboard' %}" 
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-green-600 to-cyan-600 dark:from-green-500 dark:to-cyan-500 hover:from-green-700 hover:to-cyan-700 dark:hover:from-green-600 dark:hover:to-cyan-600 transform hover:scale-105 transition-all duration-200">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    返回DASHBOARD
+                </a>
+            </div>
+        </div>
+
+        <!-- 管理功能分组 -->
+        <div class="space-y-8">
+            <!-- 基础配置组 -->
+            <div>
+                <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200 flex items-center">
+                    <i class="fas fa-sliders-h mr-2"></i>
+                    基础配置
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% include 'conferenceApp/components/basic_settings.html' %}
+                    {% include 'conferenceApp/components/email_settings.html' %}
+                </div>
+            </div>
+
+            <!-- 数据管理组 -->
+            <div>
+                <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200 flex items-center">
+                    <i class="fas fa-database mr-2"></i>
+                    数据管理
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <!-- 数据导出卡片 -->
+                    <a href="{% url 'export_management' %}" class="block group">
+                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg border-t-4 border-purple-500 hover:shadow-xl transition-all duration-300 h-full">
+                            <div class="p-6 h-full flex flex-col justify-between">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-md p-3">
+                                        <i class="fas fa-file-export text-white text-xl"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">数据导出</h3>
+                                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">导出系统数据</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                                    点击进入数据导出管理页面，您可以导出系统中的各类数据。
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- 日志管理卡片 -->
+                    <a href="{% url 'download_logs' %}" class="block group">
+                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg border-t-4 border-indigo-500 hover:shadow-xl transition-all duration-300 h-full">
+                            <div class="p-6 h-full flex flex-col justify-between">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-md p-3">
+                                        <i class="fas fa-history text-white text-xl"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <h3 class="text-lg font-medium text-gray-900 dark:text-white">日志管理</h3>
+                                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">查看系统日志</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                                    点击下载系统运行日志，帮助您分析和解决问题。
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 系统监控组 -->
+            <div>
+                <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200 flex items-center">
+                    <i class="fas fa-chart-line mr-2"></i>
+                    系统监控
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 系统状态卡片 -->
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg border-t-4 border-blue-500 hover:shadow-xl transition-all duration-300">
+                        <div class="p-6">
+                            <div class="flex items-center mb-6">
+                                <div class="flex-shrink-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-md p-3">
+                                    <i class="fas fa-server text-white text-xl"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">系统状态</h3>
+                                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">查看系统运行状态</p>
+                                </div>
+                            </div>
+                            {% include 'conferenceApp/components/system_overview.html' %}
+                        </div>
+                    </div>
+
+                    {% include 'conferenceApp/components/performance_monitor.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function sendTestEmail() {
+    const testEmail = document.getElementById('test_email').value;
+    if (!testEmail) {
+        alert('请输入测试邮箱地址');
+        return;
+    }
+
+    // 显示加载状态
+    const button = event.target.closest('button');
+    const originalContent = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>发送中...';
+
+    // 发送测试邮件
+    fetch('{% url "send_test_email" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            email: testEmail
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('测试邮件发送成功！');
+        } else {
+            alert('测试邮件发送失败：' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('发送失败：' + error);
+    })
+    .finally(() => {
+        // 恢复按钮状态
+        button.disabled = false;
+        button.innerHTML = originalContent;
+    });
+}
+</script>
+{% endblock %}

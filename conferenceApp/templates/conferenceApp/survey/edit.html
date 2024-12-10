@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}编辑问卷{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 页面标题 -->
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center space-x-4">
+                <a href="{% url 'conference:survey_list' %}" class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+                    <i class="fas fa-arrow-left"></i>
+                    <span class="ml-2">返回列表</span>
+                </a>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+                    编辑问卷
+                </h1>
+            </div>
+        </div>
+
+        <!-- 问卷表单 -->
+        <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+            <form id="surveyForm" method="post" class="space-y-6 p-6">
+                {% csrf_token %}
+                
+                <!-- 基本信息 -->
+                <div class="space-y-4">
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            问卷标题
+                        </label>
+                        <input type="text" name="title" id="title" required value="{{ survey.title }}"
+                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    </div>
+                    
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            问卷说明
+                        </label>
+                        <textarea name="description" id="description" rows="3"
+                                  class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">{{ survey.description }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Form.io Builder -->
+                <div class="space-y-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        问卷内容设计
+                    </label>
+                    <div id="formBuilder"></div>
+                    <input type="hidden" name="formio_schema" id="formio_schema">
+                </div>
+
+                <!-- 提交按钮 -->
+                <div class="flex justify-end space-x-4">
+                    <button type="button" onclick="window.location.href='{% url 'conference:survey_list' %}'"
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+                        取消
+                    </button>
+                    <button type="submit"
+                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        保存问卷
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.form.io/formiojs/formio.full.min.js"></script>
+<script>
+// 初始化 Form.io Builder
+Formio.builder(document.getElementById('formBuilder'), {{ survey.formio_schema|safe }}, {
+    builder: {
+        basic: {
+            default: true,
+            components: {
+                textfield: true,
+                textarea: true,
+                email: true,
+                phoneNumber: true,
+                number: true,
+                password: false,
+                radio: true,
+                selectboxes: true,
+                select: true,
+                checkbox: true,
+                datetime: true,
+                day: false,
+                time: false,
+                currency: false,
+                survey: true,
+                matrix: true,
+                columns: false,
+                fieldset: false,
+                panel: false,
+                table: false,
+                tabs: false,
+                well: false,
+                hidden: false,
+                container: false,
+                datamap: false,
+                datagrid: false,
+                editgrid: false,
+                tree: false
+            }
+        },
+        advanced: false,
+        data: false,
+        layout: false,
+        premium: false
+    }
+}).then(function(builder) {
+    document.getElementById('surveyForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        // 获取表单设计的 schema
+        const schema = builder.schema;
+        document.getElementById('formio_schema').value = JSON.stringify(schema);
+        this.submit();
+    });
+});
+</script>
+{% endblock %}

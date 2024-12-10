@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 页面标题 -->
+        <div class="flex justify-between items-center mb-8 bg-white/30 backdrop-blur-md rounded-xl p-4 shadow-lg">
+            <div class="flex items-center">
+                <i class="fas fa-users text-white text-4xl mr-4 animate-bounce"></i>
+                <h1 class="text-3xl font-bold text-white">批量导入用户</h1>
+            </div>
+            <a href="{% url 'system_management' %}" 
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                <i class="fas fa-arrow-left mr-2"></i>
+                返回系统管理
+            </a>
+        </div>
+        
+        {% if messages %}
+        <div class="space-y-4">
+            {% for message in messages %}
+            <div class="rounded-xl p-4 {% if message.tags == 'success' %}bg-gradient-to-r from-green-500 to-emerald-500{% else %}bg-gradient-to-r from-red-500 to-pink-500{% endif %} text-white shadow-lg">
+                <div class="flex items-center">
+                    <i class="{% if message.tags == 'success' %}fas fa-check-circle{% else %}fas fa-exclamation-circle{% endif %} text-2xl mr-3"></i>
+                    <p class="text-sm font-medium">{{ message }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- 导入说明 -->
+        <div class="bg-white/80 backdrop-blur-md rounded-xl shadow-lg mb-6 overflow-hidden transform hover:shadow-xl transition-all duration-200">
+            <div class="px-6 py-5">
+                <h3 class="text-xl leading-6 font-bold text-purple-700 mb-4 flex items-center">
+                    <i class="fas fa-info-circle mr-2 text-purple-500"></i>
+                    导入说明
+                </h3>
+                <div class="prose prose-purple max-w-none">
+                    <p class="text-sm text-gray-600 mb-4">Excel文件必须包含以下字段：</p>
+                    <ul class="space-y-2">
+                        <li class="flex items-center text-gray-700">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            name (姓名) - 必填
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            companyCode (公司代码) - 必填
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            email (邮箱) - 必填
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            is_admin (是否管理员) - 可选，默认False
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            can_publish_announcements (是否可以发布公告) - 可选，默认False
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            can_private_message (是否可以发送私信) - 可选，默认False
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                            is_event_staff (是否是工作人员) - 可选，默认False
+                        </li>
+                    </ul>
+                    <p class="text-sm text-gray-600 mt-4 mb-2">注意事项：</p>
+                    <ul class="space-y-2">
+                        <li class="flex items-center text-gray-700">
+                            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                            用户代码将自动生成6位数字
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                            密码将自动生成8位字符（包含数字和字母）
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                            邮箱必须是有效的格式且不能重复
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                            布尔类型字段可以使用True/False或1/0表示
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 文件上传区域 -->
+        <div class="bg-white/80 backdrop-blur-md rounded-xl shadow-lg mb-6 overflow-hidden transform hover:shadow-xl transition-all duration-200">
+            <div class="px-6 py-5">
+                <h3 class="text-xl leading-6 font-bold text-purple-700 mb-4 flex items-center">
+                    <i class="fas fa-upload mr-2 text-purple-500"></i>
+                    上传文件
+                </h3>
+                <form method="post" enctype="multipart/form-data" class="space-y-6">
+                    {% csrf_token %}
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-xl hover:border-purple-500 transition-colors duration-200 group bg-gradient-to-br from-purple-50 to-pink-50">
+                        <div class="space-y-1 text-center">
+                            <i class="fas fa-cloud-upload-alt text-6xl text-purple-400 mb-4 group-hover:text-purple-500 transition-colors duration-200 group-hover:animate-bounce"></i>
+                            <div class="flex text-sm text-gray-600">
+                                <label for="file-upload"
+                                    class="relative cursor-pointer rounded-md font-medium text-purple-600 hover:text-purple-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-purple-500">
+                                    <span>选择文件</span>
+                                    <input id="file-upload" name="file" type="file" class="sr-only" accept=".xlsx">
+                                </label>
+                                <p class="pl-1">或拖放文件到此处</p>
+                            </div>
+                            <p class="text-xs text-gray-500">仅支持 .xlsx 格式文件</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit"
+                            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                            <i class="fas fa-upload mr-2"></i>
+                            开始导入
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 已导入用户列表 -->
+        <div class="bg-white/80 backdrop-blur-md rounded-xl shadow-lg overflow-hidden transform hover:shadow-xl transition-all duration-200">
+            <div class="px-6 py-5">
+                <h3 class="text-xl leading-6 font-bold text-purple-700 mb-4 flex items-center">
+                    <i class="fas fa-users mr-2 text-purple-500"></i>
+                    已有用户列表
+                </h3>
+                <p class="mt-1 text-sm text-gray-500">显示最近添加的用户</p>
+            </div>
+            <div class="border-t border-gray-200">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gradient-to-r from-purple-100 to-pink-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户代码</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">姓名</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">邮箱</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">公司代码</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">注册时间</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for user in users %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ user.number }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.email }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.companyCode }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.date_joined|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 分页 -->
+            <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    {% if users.has_previous %}
+                    <a href="?page={{ users.previous_page_number }}" 
+                        class="relative inline-flex items-center px-4 py-2 border border-purple-300 text-sm font-medium rounded-md text-purple-700 bg-white hover:bg-purple-50">
+                        上一页
+                    </a>
+                    {% endif %}
+                    {% if users.has_next %}
+                    <a href="?page={{ users.next_page_number }}" 
+                        class="relative inline-flex items-center px-4 py-2 border border-purple-300 text-sm font-medium rounded-md text-purple-700 bg-white hover:bg-purple-50">
+                        下一页
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            显示第 
+                            <span class="font-medium">{{ users.start_index }}</span>
+                            到
+                            <span class="font-medium">{{ users.end_index }}</span>
+                            条记录，共
+                            <span class="font-medium">{{ users.paginator.count }}</span>
+                            条
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            {% if users.has_previous %}
+                            <a href="?page={{ users.previous_page_number }}"
+                                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-purple-300 bg-white text-sm font-medium text-purple-500 hover:bg-purple-50">
+                                <span class="sr-only">上一页</span>
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                            {% endif %}
+                            
+                            {% for i in users.paginator.page_range %}
+                            {% if users.number == i %}
+                            <span class="relative inline-flex items-center px-4 py-2 border border-purple-300 bg-purple-50 text-sm font-medium text-purple-600">
+                                {{ i }}
+                            </span>
+                            {% else %}
+                            <a href="?page={{ i }}"
+                                class="relative inline-flex items-center px-4 py-2 border border-purple-300 bg-white text-sm font-medium text-purple-500 hover:bg-purple-50">
+                                {{ i }}
+                            </a>
+                            {% endif %}
+                            {% endfor %}
+
+                            {% if users.has_next %}
+                            <a href="?page={{ users.next_page_number }}"
+                                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-purple-300 bg-white text-sm font-medium text-purple-500 hover:bg-purple-50">
+                                <span class="sr-only">下一页</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

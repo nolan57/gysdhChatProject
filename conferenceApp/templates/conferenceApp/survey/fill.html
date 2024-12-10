@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}填写问卷{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.form.io/formiojs/formio.full.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 页面标题 -->
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center space-x-4">
+                <a href="{% url 'conference:detail' conference.id %}" class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
+                    <i class="fas fa-arrow-left"></i>
+                    <span class="ml-2">返回会议详情</span>
+                </a>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+                    {{ survey.title }}
+                </h1>
+            </div>
+        </div>
+
+        <!-- 问卷说明 -->
+        {% if survey.description %}
+        <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-6">
+            <div class="px-4 py-5 sm:px-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                    问卷说明
+                </h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+                    {{ survey.description }}
+                </p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 问卷表单 -->
+        <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+            <form id="surveyForm" method="post" class="space-y-6 p-6">
+                {% csrf_token %}
+                <div id="formio"></div>
+                <input type="hidden" name="response_data" id="response_data">
+
+                <!-- 提交按钮 -->
+                <div class="flex justify-end space-x-4 mt-6">
+                    <button type="button" onclick="window.location.href='{% url 'conference:detail' conference.id %}'"
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+                        取消
+                    </button>
+                    <button type="submit"
+                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        提交问卷
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.form.io/formiojs/formio.full.min.js"></script>
+<script>
+// 初始化 Form.io 表单
+Formio.createForm(document.getElementById('formio'), {{ survey.formio_schema|safe }}, {
+    readOnly: false,
+    noAlerts: true
+}).then(function(form) {
+    {% if existing_response %}
+    // 如果有已存在的回答，加载数据
+    form.submission = {
+        data: {{ existing_response.response_data|safe }}
+    };
+    {% endif %}
+
+    document.getElementById('surveyForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        // 获取表单数据
+        const data = form.submission.data;
+        document.getElementById('response_data').value = JSON.stringify(data);
+        this.submit();
+    });
+});
+</script>
+{% endblock %}

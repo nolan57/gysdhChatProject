@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}发布注意事项 - GYSDH CHAT{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-green-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 页面标题 -->
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center">
+                <i class="fas fa-bullhorn text-green-600 dark:text-green-400 text-4xl mr-4"></i>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-cyan-600 dark:from-green-400 dark:to-cyan-400">发布注意事项</h1>
+            </div>
+            <a href="{% url 'dashboard' %}" class="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                <i class="fas fa-arrow-left mr-2"></i>
+                返回DASHBOARD
+            </a>
+        </div>
+
+        <!-- 当前注意事项 -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-6 overflow-hidden transform hover:shadow-xl transition-all duration-200">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mb-4">当前注意事项</h3>
+                {% if current_notice %}
+                <div class="bg-green-50 dark:bg-green-900 rounded-lg p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-green-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-green-700 dark:text-green-300">{{ current_notice.content }}</p>
+                            <p class="mt-2 text-xs text-green-500 dark:text-green-400">
+                                发布时间：{{ current_notice.timestamp|date:"Y-m-d H:i:s" }}
+                                {% if current_notice.updated_at %}
+                                | 最后更新：{{ current_notice.updated_at|date:"Y-m-d H:i:s" }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-gray-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">暂无注意事项</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 发布表单 -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transform hover:shadow-xl transition-all duration-200">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 mb-4">发布新注意事项</h3>
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    <div>
+                        <label for="notice_content" class="block text-sm font-medium text-gray-700 dark:text-gray-300">内容</label>
+                        <div class="mt-1">
+                            <textarea id="notice_content" name="notice_content" rows="4"
+                                class="shadow-sm focus:ring-green-500 focus:border-green-500 mt-1 block w-full sm:text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md resize-none transition-all duration-200"
+                                placeholder="请输入注意事项内容...">{{ form.notice_content.value|default:'' }}</textarea>
+                        </div>
+                        {% if form.notice_content.errors %}
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ form.notice_content.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            发布新的注意事项将会替换当前的注意事项
+                        </div>
+                        <button type="submit"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-green-600 to-cyan-600 dark:from-green-500 dark:to-cyan-500 hover:from-green-700 hover:to-cyan-700 dark:hover:from-green-600 dark:hover:to-cyan-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200">
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            发布注意事项
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 操作说明 -->
+        <div class="mt-6 bg-gradient-to-r from-green-500 to-cyan-500 dark:from-green-900 dark:to-cyan-900 rounded-lg shadow-lg overflow-hidden transform hover:shadow-xl transition-all duration-200">
+            <div class="px-4 py-5 sm:p-6 text-white dark:text-gray-100">
+                <h3 class="text-lg leading-6 font-medium mb-4">操作说明</h3>
+                <ul class="list-disc pl-5 space-y-2 text-green-50 dark:text-gray-400">
+                    <li>注意事项将显示在聊天室侧边栏，所有用户可见</li>
+                    <li>建议控制内容长度，确保显示效果</li>
+                    <li>支持基本的文本格式，如换行等</li>
+                    <li>发布新的注意事项后，旧的注意事项将被存档</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 消息提示 -->
+        {% if messages %}
+        <div class="mt-6">
+            {% for message in messages %}
+            <div class="rounded-lg {% if message.tags == 'success' %}bg-green-50 dark:bg-green-900{% else %}bg-red-50 dark:bg-red-900{% endif %} p-4 transform hover:scale-105 transition-all duration-200">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        {% if message.tags == 'success' %}
+                        <i class="fas fa-check-circle text-green-400"></i>
+                        {% else %}
+                        <i class="fas fa-exclamation-circle text-red-400"></i>
+                        {% endif %}
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium {% if message.tags == 'success' %}text-green-800 dark:text-green-300{% else %}text-red-800 dark:text-red-300{% endif %}">
+                            {{ message }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

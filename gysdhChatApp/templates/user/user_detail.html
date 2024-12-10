@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.name }} - 用户详情 - GYSDH CHAT{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-6">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 页面标题 -->
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center">
+                <i class="fas fa-user text-indigo-600 dark:text-indigo-400 text-4xl mr-4"></i>
+                <div>
+                    <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">用户详情</h1>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">查看和管理用户信息</p>
+                </div>
+            </div>
+            <a href="{% url 'user_list' %}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-gray-600 to-gray-700 dark:from-gray-700 dark:to-gray-800 hover:from-gray-700 hover:to-gray-800 dark:hover:from-gray-800 dark:hover:to-gray-900 transform hover:scale-105 transition-all duration-200">
+                <i class="fas fa-arrow-left mr-2"></i>
+                返回用户列表
+            </a>
+        </div>
+
+        <!-- 用户信息卡片 -->
+        <div class="bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden mb-6">
+            <div class="p-6">
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">用户编号</h3>
+                        <p class="mt-1 text-lg text-gray-900 dark:text-gray-100">{{ user.number }}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">用户名</h3>
+                        <p class="mt-1 text-lg text-gray-900 dark:text-gray-100">{{ user.name }}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">邮箱</h3>
+                        <p class="mt-1 text-lg text-gray-900 dark:text-gray-100">{{ user.email }}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">公司代码</h3>
+                        <p class="mt-1 text-lg text-gray-900 dark:text-gray-100">{{ user.companyCode }}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">用户组</h3>
+                        <p class="mt-1 text-lg text-gray-900 dark:text-gray-100">{{ user.group.name|default:"未分配" }}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">注册时间</h3>
+                        <p class="mt-1 text-lg text-gray-900 dark:text-gray-100">{{ user.date_joined|date:"Y-m-d H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户权限 -->
+        <div class="bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden mb-6">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">用户权限</h2>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-user-shield text-indigo-600 dark:text-indigo-400 mr-2"></i>
+                        <span class="text-gray-700 dark:text-gray-300">管理员权限</span>
+                        <span class="ml-2">{% if user.is_admin %}
+                            <i class="fas fa-check text-green-500"></i>
+                        {% else %}
+                            <i class="fas fa-times text-red-500"></i>
+                        {% endif %}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-bullhorn text-indigo-600 dark:text-indigo-400 mr-2"></i>
+                        <span class="text-gray-700 dark:text-gray-300">发布公告权限</span>
+                        <span class="ml-2">{% if user.can_publish_announcements %}
+                            <i class="fas fa-check text-green-500"></i>
+                        {% else %}
+                            <i class="fas fa-times text-red-500"></i>
+                        {% endif %}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-comments text-indigo-600 dark:text-indigo-400 mr-2"></i>
+                        <span class="text-gray-700 dark:text-gray-300">私信权限</span>
+                        <span class="ml-2">{% if user.can_private_message %}
+                            <i class="fas fa-check text-green-500"></i>
+                        {% else %}
+                            <i class="fas fa-times text-red-500"></i>
+                        {% endif %}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-user-tie text-indigo-600 dark:text-indigo-400 mr-2"></i>
+                        <span class="text-gray-700 dark:text-gray-300">工作人员</span>
+                        <span class="ml-2">{% if user.is_event_staff %}
+                            <i class="fas fa-check text-green-500"></i>
+                        {% else %}
+                            <i class="fas fa-times text-red-500"></i>
+                        {% endif %}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户标签 -->
+        <div class="bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">用户标签</h2>
+                <a href="{% url 'manage_user_tags' user.id %}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
+                    <i class="fas fa-tags mr-1"></i>
+                    管理标签
+                </a>
+            </div>
+            <div class="p-6">
+                {% if user_tags %}
+                <div class="flex flex-wrap gap-2">
+                    {% for user_tag in user_tags %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium" style="background-color: {{ user_tag.tag.color }}20; color: {{ user_tag.tag.color }};">
+                        <i class="fas fa-tag mr-1"></i>
+                        {{ user_tag.tag.name }}
+                    </span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-gray-500 dark:text-gray-400">暂无标签</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

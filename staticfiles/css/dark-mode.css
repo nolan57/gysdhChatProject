@@ -1,0 +1,145 @@
+/* 黑暗模式样式 */
+:root {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --border-color: #e2e8f0;
+    --message-self: #e0f2fe;
+    --message-other: #f1f5f9;
+    --message-online: #dbeafe;
+    --message-offline: #f1f5f9;
+}
+
+.dark {
+    --bg-primary: #1e293b;
+    --bg-secondary: #0f172a;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --border-color: #334155;
+    --message-self: #0c4a6e;
+    --message-other: #334155;
+    --message-online: #1e3a8a;
+    --message-offline: #1e293b;
+}
+
+/* 基础样式 */
+.dark body {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* 消息气泡 */
+.dark .message-bubble {
+    color: var(--text-primary);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.dark .message-bubble.current-user {
+    background-color: var(--message-self);
+}
+
+.dark .message-bubble.other-user {
+    background-color: var(--message-other);
+}
+
+.dark .message-bubble.other-user.online {
+    background-color: var(--message-online);
+}
+
+.dark .message-bubble.other-user.offline {
+    background-color: var(--message-offline);
+}
+
+/* 滚动条 */
+.dark ::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: var(--text-secondary);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-primary);
+}
+
+/* 输入区域 */
+.dark .chat-input {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+}
+
+/* 按钮 */
+.dark .btn-primary {
+    background-color: #2563eb;
+    color: white;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1);
+}
+
+.dark .btn-secondary {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 文件上传 */
+.dark .file-upload {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+}
+
+/* 侧边栏 */
+.dark .sidebar {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+}
+
+/* 公告区域 */
+.dark .announcement {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+}
+
+/* 在线状态指示器 */
+.dark .online-indicator.online {
+    background-color: #0ea5e9;
+    box-shadow: 0 0 8px rgba(14, 165, 233, 0.4);
+}
+
+.dark .online-indicator.offline {
+    background-color: #64748b;
+}
+
+/* 模态框 */
+.dark .modal {
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+}
+
+/* 输入框 */
+.dark input[type="text"],
+.dark input[type="password"],
+.dark textarea {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+/* 下拉菜单 */
+.dark select {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+/* 链接 */
+.dark a {
+    color: #38bdf8;
+    transition: color 0.2s ease;
+}
+
+.dark a:hover {
+    color: #0ea5e9;
+}

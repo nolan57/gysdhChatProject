@@ -1,0 +1,31 @@
+<!-- 报名提示信息 -->
+{% if registration_status.is_registration_period %}
+    <div class="mb-4 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <i class="fas fa-info-circle text-blue-600 dark:text-blue-400"></i>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">
+                    报名信息
+                </h3>
+                <div class="mt-2 text-sm text-blue-700 dark:text-blue-200">
+                    <p>
+                        {% if registration_status.company_spaces_left is not None %}
+                            您所在单位还可以报名 {{ registration_status.company_spaces_left }} 人
+                            （每个单位限报 {{ conference.company_max_participants }} 人）
+                        {% else %}
+                            本次会议还可以报名 {{ registration_status.spaces_left }} 人
+                        {% endif %}
+                    </p>
+                    {% if registration_status.company_limit_reached %}
+                        <p class="mt-1 text-red-600 dark:text-red-400">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            您所在单位的报名人数已达上限
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}

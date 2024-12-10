@@ -1,0 +1,1280 @@
+[
+{
+  "model": "sessions.session",
+  "pk": "0o3ker6p7mvgjiwagiwzgb4o8hc6qjdf",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQRO_iGln-bryU9DmD5c8GB5AtxUmFuDuJlAK60bw382Y-bGvxW6fFz5ldmWSX3y6G9KR6gPwI9d54anVd5sgPhZ-087Flet1O9--ghF72tUIjATRlmLQmDZhiRAkIkzNWDnsgTAO6ZIGcciIJQ2hRS8oCjJLs8wW5KjaD:1tAlnq:0io0hxwK7PzNQy39SpdMvJbv7cI8iZw53MhcnFo9pCA",
+    "expire_date": "2024-11-26T07:59:10.920Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "1nui6xuboeb3bdj6b8exqg2f6sl4geij",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQRe_C2hAGJgIu3XsGMgNTqRqalHbVeHdt0oVu_3vvbyrRutS0dpnTWNRFgTr9bkz5KW0H5UHtPuk8tWUeWe-KPmjXt6nI63q4fweVev3W4m3IQigSLAJaFgzCFlwYeHBGKDhjMUaMyIEMQPYAlItBODvPRr0_4uY3Wg:1tH1VB:sewTPWjKWgkd6AE05gQH3I_6MD3wIBQLmmCm63YU2pw",
+    "expire_date": "2024-12-13T13:57:45.402Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "2iu7jdt7y3m34kxe9g0uf872ddug7mow",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQRe_C2hAGJgIu3XsGMgNTqRqalHbVeHdt0oVu_3vvbyrRutS0dpnTWNRFgTr9bkz5KW0H5UHtPuk8tWUeWe-KPmjXt6nI63q4fweVev3W4m3IQigSLAJaFgzCFlwYeHBGKDhjMUaMyIEMQPYAlItBODvPRr0_4uY3Wg:1tEU20:6AV_rQVMtWeZmAmovf7YgLyd1BHyKzZxwsW0t-Vywuo",
+    "expire_date": "2024-12-06T13:49:08.083Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "5yx8t14bajozizj3pgsj8dwbqul6e7u1",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQRO_iGln-bryU9DmD5c8GB5AtxUmFuDuJlAK60bw382Y-bGvxW6fFz5ldmWSX3y6G9KR6gPwI9d54anVd5sgPhZ-087Flet1O9--ghF72tUIjATRlmLQmDZhiRAkIkzNWDnsgTAO6ZIGcciIJQ2hRS8oCjJLs8wW5KjaD:1tAxDQ:n46dTMzbdIoSbG7hR5ctSN99IL1iDm84lBsCoUYA-Tw",
+    "expire_date": "2024-11-26T20:10:20.534Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "7bw1vdc6apw15gco7j0p1hkhw90uy6hj",
+  "fields": {
+    "session_data": ".eJxVjMEOwiAQRP-FsyFAYVk8eu83NAtLbdVAUtqT8d9tkx70ODPvzVsMtK3TsLW8DDOLq3Di8ttFSs9cjoEfVO5VplrWZY7yQOS5NtlXzq_byf4dTNSm3e6sAfDWcgwII2vgrMAn79Blg2HPFlVC9gCGvRqJUKPalTDqDjSJzxe6izaq:1tC5au:QzHRczwpfY_fmFvLJ6ZFqbfz2WAZzeIe0LFBnF0Iy5M",
+    "expire_date": "2024-11-29T23:19:16.961Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "8eg1lrlhswltyl5l3lvj58burw9uxm3z",
+  "fields": {
+    "session_data": ".eJxVizsOwjAQBe_iGkVefzZeOqDPFSx_NhghUBTHRYS4O0FKAd3TvJmX8KEtxbfKs79lcRQgDr8shnTn5_e4rjWXSwnLaZq6HdduaI_I83m3_tISatk6RQYQNWcctWaNlGIkQMLRGQv9NphSTy5ZZKecTNIwWdLAWaJRIN4fRds0SQ:1t9yxF:X322AXdXEHpd9ChYPW9CdJ8tF-lwqU9KVfdo2neLV5g",
+    "expire_date": "2024-11-24T03:49:37.678Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "8jd1qcod1i36at94hp1x191i6o8knbdy",
+  "fields": {
+    "session_data": ".eJxVizsOwjAQBe_iGkVefzZeOqDPFSx_NhghUBTHRYS4O0FKAd3TvJmX8KEtxbfKs79lcRQgDr8shnTn5_e4rjWXSwnLaZq6HdduaI_I83m3_tISatk6RQYQNWcctWaNlGIkQMLRGQv9NphSTy5ZZKecTNIwWdLAWaJRIN4fRds0SQ:1tA5Bv:5AL_HKfVEK8gDnbly08CeZFsS_IUSTqNudq8SNbQjW0",
+    "expire_date": "2024-11-24T10:29:11.819Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "bz1jtayfmqi9dmmhassij1rjk4971ubo",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGln-xR9Kes5gee1dHEC2FCcV4u4QKQW0b2bei8W0rTVuA5c4F3ZmEzv9bpDyA9sOyj21W-e5t3WZge8KP-jg117weTncv4OaRv3WgWwyVISjIic0VivjdJBSWQAZEJwKQUk0SMGXRF5o4Qm8B8xE2ln2_gDc4Tf1:1tH0p2:SeWHZG3OyHrB35L5Ii9vGvZ4Xa_XGOh1flnTTyNZ-9Y",
+    "expire_date": "2024-12-13T13:14:12.725Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "mq9bgitskd2fhbbmgptvl1betydi9l5h",
+  "fields": {
+    "session_data": ".eJxVjMEOwiAQRP-FsyFAYVk8eu83NAtLbdVAUtqT8d9tkx70ODPvzVsMtK3TsLW8DDOLq3Di8ttFSs9cjoEfVO5VplrWZY7yQOS5NtlXzq_byf4dTNSm3e6sAfDWcgwII2vgrMAn79Blg2HPFlVC9gCGvRqJUKPalTDqDjSJzxe6izaq:1tA93i:ocR1My29fp0tGXnIHoWQYriUTUO8dKKlFEw1tz8AVek",
+    "expire_date": "2024-11-24T14:36:58.226Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "smu59w483jxe8kerra0i72qd8zvbt6bo",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQRO_iGln-bryU9DmD5c8GB5AtxUmFuDuJlAK60bw382Y-bGvxW6fFz5ldmWSX3y6G9KR6gPwI9d54anVd5sgPhZ-087Flet1O9--ghF72tUIjATRlmLQmDZhiRAkIkzNWDnsgTAO6ZIGcciIJQ2hRS8oCjJLs8wW5KjaD:1tCEXM:V2M3xOuPXjC71dIqvucg1UmklPeLTRdIvo_YG3_pbos",
+    "expire_date": "2024-11-30T08:52:12.047Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "xx6eyhz3b2k2pmh3i1vmc02fio47sbzv",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQRO_iGln-bryU9DmD5c8GB5AtxUmFuDuJlAK60bw382Y-bGvxW6fFz5ldmWSX3y6G9KR6gPwI9d54anVd5sgPhZ-087Flet1O9--ghF72tUIjATRlmLQmDZhiRAkIkzNWDnsgTAO6ZIGcciIJQ2hRS8oCjJLs8wW5KjaD:1tBDn9:h8wQaq0qsUAO6yzjN0JdVdLy50qDGZXakf2Ud66GtK0",
+    "expire_date": "2024-11-27T13:52:19.070Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "xxlltw8hbfe67yjodgt507xfd76vl2yy",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQRO_iGln-bryU9DmD5c8GB5AtxUmFuDuJlAK60bw382Y-bGvxW6fFz5ldmWSX3y6G9KR6gPwI9d54anVd5sgPhZ-087Flet1O9--ghF72tUIjATRlmLQmDZhiRAkIkzNWDnsgTAO6ZIGcciIJQ2hRS8oCjJLs8wW5KjaD:1tCKMG:aHa1FXLIxotjLORH-jD2cQinMXBBZNyijYhBfHIKXxk",
+    "expire_date": "2024-11-30T15:05:08.720Z"
+  }
+},
+{
+  "model": "gysdhChatApp.usergroup",
+  "pk": 1,
+  "fields": {
+    "name": "供应商",
+    "description": "",
+    "created_at": "2024-11-18T11:56:12.291Z",
+    "updated_at": "2024-11-18T11:56:12.291Z"
+  }
+},
+{
+  "model": "gysdhChatApp.usergroup",
+  "pk": 2,
+  "fields": {
+    "name": "嘉宾",
+    "description": "",
+    "created_at": "2024-11-24T13:41:26.119Z",
+    "updated_at": "2024-11-24T13:41:26.119Z"
+  }
+},
+{
+  "model": "gysdhChatApp.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$870000$Vt0rKG3X8rngnt5iLt60bz$dkTsWDwZXrpI2bsaR+fJkHlsIwe2cL35p2uepBw9u/c=",
+    "last_login": "2024-11-29T13:57:45.371Z",
+    "number": "999999",
+    "name": "wuqiang",
+    "companyCode": "GHAC",
+    "email": "user0@example.com",
+    "_encrypted_original_password": "pbkdf2_sha256$870000$original_pwd$trUOq96nUd4OiPZ9mMKcFYMhVuzL++kQ2QXbXHY4234=",
+    "group": null,
+    "is_active": true,
+    "is_admin": true,
+    "can_publish_announcements": true,
+    "can_private_message": true,
+    "is_event_staff": true,
+    "is_online": true,
+    "last_activity": "2024-11-29T14:00:03.755Z",
+    "date_joined": "2024-11-15T16:09:13.541Z"
+  }
+},
+{
+  "model": "gysdhChatApp.user",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$870000$zPo8wIfyZILts8CmOo7YoC$ue7nILA4IzJXt52kLX1BmQ6tLr/AwQNnWLLBGo1mlIo=",
+    "last_login": "2024-11-29T13:12:04.644Z",
+    "number": "888888",
+    "name": "Staff",
+    "companyCode": "GHAC",
+    "email": "user1@example.com",
+    "_encrypted_original_password": "pbkdf2_sha256$870000$original_pwd$trUOq96nUd4OiPZ9mMKcFYMhVuzL++kQ2QXbXHY4234=",
+    "group": 2,
+    "is_active": true,
+    "is_admin": false,
+    "can_publish_announcements": true,
+    "can_private_message": true,
+    "is_event_staff": true,
+    "is_online": false,
+    "last_activity": "2024-11-29T13:14:12.432Z",
+    "date_joined": "2024-11-15T16:09:13.541Z"
+  }
+},
+{
+  "model": "gysdhChatApp.user",
+  "pk": 5,
+  "fields": {
+    "password": "pbkdf2_sha256$870000$Vm7eqDpyMlvUgrELpooNpV$iW4Mc02NXHiJeoCuabgcxsY+tRlBaiFU+geNgbRNlSk=",
+    "last_login": "2024-11-29T13:14:12.685Z",
+    "number": "777777",
+    "name": "Supplier",
+    "companyCode": "XXXXXX",
+    "email": "545266262@qq.com",
+    "_encrypted_original_password": "pbkdf2_sha256$870000$original_pwd$trUOq96nUd4OiPZ9mMKcFYMhVuzL++kQ2QXbXHY4234=",
+    "group": 1,
+    "is_active": true,
+    "is_admin": false,
+    "can_publish_announcements": false,
+    "can_private_message": true,
+    "is_event_staff": false,
+    "is_online": false,
+    "last_activity": "2024-11-29T13:14:13.219Z",
+    "date_joined": "2024-11-15T16:09:13.541Z"
+  }
+},
+{
+  "model": "gysdhChatApp.user",
+  "pk": 6,
+  "fields": {
+    "password": "pbkdf2_sha256$870000$GAQIh2HBl5upiOkZDOIAx0$mCduWeblntoWpf4zvFf9NlBr4tE02O1XmzZFHhfzM1g=",
+    "last_login": null,
+    "number": "346900",
+    "name": "Supplier2",
+    "companyCode": "666666",
+    "email": "default@example.com",
+    "_encrypted_original_password": "pbkdf2_sha256$870000$original_pwd$trUOq96nUd4OiPZ9mMKcFYMhVuzL++kQ2QXbXHY4234=",
+    "group": 2,
+    "is_active": true,
+    "is_admin": false,
+    "can_publish_announcements": false,
+    "can_private_message": true,
+    "is_event_staff": false,
+    "is_online": false,
+    "last_activity": "2024-11-24T13:42:12.407Z",
+    "date_joined": "2024-11-18T12:02:40.424Z"
+  }
+},
+{
+  "model": "gysdhChatApp.announcement",
+  "pk": 163,
+  "fields": {
+    "content": "公告文件",
+    "html_content": "公告文件",
+    "publisher": 1,
+    "file": "Announcement/LINE_Chat_with_Danielle.txt",
+    "timestamp": "2024-11-21T12:05:47.003Z",
+    "priority": 1,
+    "expires_at": null,
+    "is_sticky": false
+  }
+},
+{
+  "model": "gysdhChatApp.announcement",
+  "pk": 164,
+  "fields": {
+    "content": "公告图片",
+    "html_content": "公告图片",
+    "publisher": 1,
+    "file": "Announcement/qq_elY3opW.png",
+    "timestamp": "2024-11-21T12:06:08.871Z",
+    "priority": 1,
+    "expires_at": null,
+    "is_sticky": false
+  }
+},
+{
+  "model": "gysdhChatApp.announcement",
+  "pk": 170,
+  "fields": {
+    "content": "<ul>\n<li><del><u><em><strong>非常纠结</strong></em></u></del></li>\n<li><u><em><strong>zzzzz</strong></em></u></li>\n</ul>",
+    "html_content": "<ul>\n<li><del><u><em><strong>非常纠结</strong></em></u></del></li>\n<li><u><em><strong>zzzzz</strong></em></u></li>\n</ul>",
+    "publisher": 1,
+    "file": "",
+    "timestamp": "2024-11-27T10:52:36.975Z",
+    "priority": 4,
+    "expires_at": null,
+    "is_sticky": true
+  }
+},
+{
+  "model": "gysdhChatApp.announcement",
+  "pk": 175,
+  "fields": {
+    "content": "<ul>\n<li><del><u><em><strong>啪啪啪啪啪</strong></em></u></del></li>\n<li><u><em><strong>mmmmmm</strong></em></u></li>\n</ul>",
+    "html_content": "<ul>\n<li><del><u><em><strong>啪啪啪啪啪</strong></em></u></del></li>\n<li><u><em><strong>mmmmmm</strong></em></u></li>\n</ul>",
+    "publisher": 1,
+    "file": "",
+    "timestamp": "2024-11-29T13:59:24.740Z",
+    "priority": 3,
+    "expires_at": "2024-11-30T21:59:00Z",
+    "is_sticky": false
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 364,
+  "fields": {
+    "sender": 1,
+    "content": "公共信息",
+    "file": "",
+    "timestamp": "2024-11-21T12:03:50.136Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": true,
+    "recalled_at": "2024-11-21T12:03:54.576Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 365,
+  "fields": {
+    "sender": 1,
+    "content": "公开文件",
+    "file": "Message/LINE_Chat_with_Danielle_otgyRHA.txt",
+    "timestamp": "2024-11-21T12:04:11.596Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 366,
+  "fields": {
+    "sender": 1,
+    "content": "公开图片",
+    "file": "Message/Arrow_o9Hwy8l.png",
+    "timestamp": "2024-11-21T12:04:37.390Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 367,
+  "fields": {
+    "sender": 1,
+    "content": "私密信息",
+    "file": "",
+    "timestamp": "2024-11-21T12:06:33.953Z",
+    "is_private": true,
+    "recipient": 1,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 368,
+  "fields": {
+    "sender": 1,
+    "content": "私密文件",
+    "file": "Message/LINE_Chat_with_Danielle_ILbHXUU.txt",
+    "timestamp": "2024-11-21T12:06:50.983Z",
+    "is_private": true,
+    "recipient": 1,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 369,
+  "fields": {
+    "sender": 1,
+    "content": "私密图片",
+    "file": "Message/wenjian_XhAFodP.png",
+    "timestamp": "2024-11-21T12:07:15.495Z",
+    "is_private": true,
+    "recipient": 1,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 370,
+  "fields": {
+    "sender": 5,
+    "content": "hello,99999",
+    "file": "",
+    "timestamp": "2024-11-21T12:08:15.707Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": true,
+    "recalled_at": "2024-11-21T12:08:27.942Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 371,
+  "fields": {
+    "sender": 5,
+    "content": "私密99999",
+    "file": "",
+    "timestamp": "2024-11-21T12:08:42.465Z",
+    "is_private": true,
+    "recipient": 1,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 372,
+  "fields": {
+    "sender": 1,
+    "content": "hello,777777",
+    "file": "",
+    "timestamp": "2024-11-21T12:08:59.911Z",
+    "is_private": true,
+    "recipient": 5,
+    "reply_to": 371,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 373,
+  "fields": {
+    "sender": 1,
+    "content": "回复文件",
+    "file": "Message/LINE_Chat_with_Danielle_hFOQpbA.txt",
+    "timestamp": "2024-11-21T12:09:18.006Z",
+    "is_private": true,
+    "recipient": 5,
+    "reply_to": 371,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 374,
+  "fields": {
+    "sender": 1,
+    "content": "回复图片",
+    "file": "Message/xiazai_3ewOCLD.png",
+    "timestamp": "2024-11-21T12:09:41.913Z",
+    "is_private": true,
+    "recipient": 5,
+    "reply_to": 371,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 375,
+  "fields": {
+    "sender": 5,
+    "content": "发一个被删的信息",
+    "file": "",
+    "timestamp": "2024-11-21T12:20:46.611Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": true,
+    "deleted_at": "2024-11-21T12:21:12.866Z",
+    "deleted_by": 1
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 376,
+  "fields": {
+    "sender": 5,
+    "content": "再发一条被删",
+    "file": "",
+    "timestamp": "2024-11-21T12:27:14.298Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": true,
+    "deleted_at": "2024-11-21T12:27:27.429Z",
+    "deleted_by": 1
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 377,
+  "fields": {
+    "sender": 1,
+    "content": "试试实时信息",
+    "file": "",
+    "timestamp": "2024-11-21T12:34:48.106Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 378,
+  "fields": {
+    "sender": 5,
+    "content": "实时回复",
+    "file": "",
+    "timestamp": "2024-11-21T12:35:25.773Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 379,
+  "fields": {
+    "sender": 1,
+    "content": "再试试",
+    "file": "",
+    "timestamp": "2024-11-21T12:36:27.955Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 380,
+  "fields": {
+    "sender": 1,
+    "content": "超吊梁",
+    "file": "",
+    "timestamp": "2024-11-21T12:54:31.870Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 381,
+  "fields": {
+    "sender": 5,
+    "content": "好像不行哦",
+    "file": "",
+    "timestamp": "2024-11-21T12:55:12.421Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": true,
+    "deleted_at": "2024-11-21T12:58:42.669Z",
+    "deleted_by": 1
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 382,
+  "fields": {
+    "sender": 1,
+    "content": "消息被删除到时实时的",
+    "file": "",
+    "timestamp": "2024-11-21T12:59:03.494Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 383,
+  "fields": {
+    "sender": 1,
+    "content": "好像真的哦",
+    "file": "",
+    "timestamp": "2024-11-21T12:59:31.234Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 384,
+  "fields": {
+    "sender": 1,
+    "content": "反反复复",
+    "file": "",
+    "timestamp": "2024-11-21T13:11:44.585Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": true,
+    "recalled_at": "2024-11-21T13:12:01.996Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 385,
+  "fields": {
+    "sender": 5,
+    "content": "刹车刹车",
+    "file": "",
+    "timestamp": "2024-11-21T13:12:14.497Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": true,
+    "deleted_at": "2024-11-21T13:12:39.684Z",
+    "deleted_by": 1
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 386,
+  "fields": {
+    "sender": 1,
+    "content": "发送到时",
+    "file": "",
+    "timestamp": "2024-11-21T13:22:27.210Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 387,
+  "fields": {
+    "sender": 5,
+    "content": "发发发",
+    "file": "",
+    "timestamp": "2024-11-21T13:22:53.458Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 388,
+  "fields": {
+    "sender": 1,
+    "content": "再试试",
+    "file": "",
+    "timestamp": "2024-11-21T13:23:24.889Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 389,
+  "fields": {
+    "sender": 5,
+    "content": "无语了",
+    "file": "",
+    "timestamp": "2024-11-21T13:23:42.362Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 390,
+  "fields": {
+    "sender": 1,
+    "content": "好像不行",
+    "file": "",
+    "timestamp": "2024-11-21T13:27:38.993Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 391,
+  "fields": {
+    "sender": 5,
+    "content": "咕咕咕咕",
+    "file": "",
+    "timestamp": "2024-11-21T13:28:11.347Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 392,
+  "fields": {
+    "sender": 1,
+    "content": "在收拾收拾",
+    "file": "",
+    "timestamp": "2024-11-21T13:51:11.817Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": true,
+    "recalled_at": "2024-11-21T13:51:37.847Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 393,
+  "fields": {
+    "sender": 5,
+    "content": "好像还是不行",
+    "file": "",
+    "timestamp": "2024-11-21T13:51:32.040Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": true,
+    "deleted_at": "2024-11-21T13:51:59.695Z",
+    "deleted_by": 1
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 394,
+  "fields": {
+    "sender": 1,
+    "content": "滴滴嗒嘀嗒",
+    "file": "",
+    "timestamp": "2024-11-21T13:56:01.458Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": true,
+    "recalled_at": "2024-11-21T13:56:50.926Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 395,
+  "fields": {
+    "sender": 5,
+    "content": "好歹呀",
+    "file": "",
+    "timestamp": "2024-11-21T13:56:45.100Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": true,
+    "deleted_at": "2024-11-21T13:57:08.238Z",
+    "deleted_by": 1
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 396,
+  "fields": {
+    "sender": 1,
+    "content": "还正常吧",
+    "file": "",
+    "timestamp": "2024-11-21T13:57:58.712Z",
+    "is_private": true,
+    "recipient": 5,
+    "reply_to": 371,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 397,
+  "fields": {
+    "sender": 1,
+    "content": "确保一下",
+    "file": "",
+    "timestamp": "2024-11-27T11:54:42.850Z",
+    "is_private": true,
+    "recipient": 1,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 398,
+  "fields": {
+    "sender": 1,
+    "content": "这边呢",
+    "file": "",
+    "timestamp": "2024-11-27T11:55:04.346Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 399,
+  "fields": {
+    "sender": 1,
+    "content": "私密呢",
+    "file": "",
+    "timestamp": "2024-11-27T11:56:47.943Z",
+    "is_private": true,
+    "recipient": 1,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 400,
+  "fields": {
+    "sender": 1,
+    "content": "公开呢",
+    "file": "",
+    "timestamp": "2024-11-27T11:56:56.246Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 401,
+  "fields": {
+    "sender": 1,
+    "content": "再试试",
+    "file": "",
+    "timestamp": "2024-11-27T12:00:57.161Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": true,
+    "deleted_at": "2024-11-29T12:30:03.031Z",
+    "deleted_by": 1
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 402,
+  "fields": {
+    "sender": 1,
+    "content": "再试试私密",
+    "file": "",
+    "timestamp": "2024-11-27T12:01:14.502Z",
+    "is_private": true,
+    "recipient": 1,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 403,
+  "fields": {
+    "sender": 1,
+    "content": "再试试",
+    "file": "",
+    "timestamp": "2024-11-27T12:17:45.073Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 404,
+  "fields": {
+    "sender": 1,
+    "content": "私密信息呢",
+    "file": "",
+    "timestamp": "2024-11-27T12:18:02.123Z",
+    "is_private": true,
+    "recipient": 1,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 405,
+  "fields": {
+    "sender": 1,
+    "content": "这下OK了",
+    "file": "",
+    "timestamp": "2024-11-27T12:23:25.715Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 406,
+  "fields": {
+    "sender": 1,
+    "content": "私密也OK了",
+    "file": "",
+    "timestamp": "2024-11-27T12:23:33.628Z",
+    "is_private": true,
+    "recipient": 1,
+    "reply_to": null,
+    "is_recalled": false,
+    "recalled_at": null,
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 407,
+  "fields": {
+    "sender": 4,
+    "content": "正常吧",
+    "file": "",
+    "timestamp": "2024-11-29T12:41:53.009Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": true,
+    "recalled_at": "2024-11-29T12:42:09.644Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.message",
+  "pk": 408,
+  "fields": {
+    "sender": 1,
+    "content": "再试试",
+    "file": "",
+    "timestamp": "2024-11-29T13:10:27.339Z",
+    "is_private": false,
+    "recipient": null,
+    "reply_to": null,
+    "is_recalled": true,
+    "recalled_at": "2024-11-29T13:10:31.398Z",
+    "is_deleted": false,
+    "deleted_at": null,
+    "deleted_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.notice",
+  "pk": 1,
+  "fields": {
+    "content": "请不用发商业秘密",
+    "publisher": 1,
+    "is_active": false,
+    "timestamp": "2024-11-16T00:20:17.123Z"
+  }
+},
+{
+  "model": "gysdhChatApp.notice",
+  "pk": 2,
+  "fields": {
+    "content": "真的行吗",
+    "publisher": 1,
+    "is_active": false,
+    "timestamp": "2024-11-18T00:48:53.780Z"
+  }
+},
+{
+  "model": "gysdhChatApp.notice",
+  "pk": 3,
+  "fields": {
+    "content": "真的行吗",
+    "publisher": 1,
+    "is_active": false,
+    "timestamp": "2024-11-18T00:50:41.220Z"
+  }
+},
+{
+  "model": "gysdhChatApp.notice",
+  "pk": 4,
+  "fields": {
+    "content": "这下可以了吧",
+    "publisher": 1,
+    "is_active": false,
+    "timestamp": "2024-11-18T01:14:33.287Z"
+  }
+},
+{
+  "model": "gysdhChatApp.notice",
+  "pk": 5,
+  "fields": {
+    "content": "公共呢",
+    "publisher": 1,
+    "is_active": false,
+    "timestamp": "2024-11-18T01:14:43.826Z"
+  }
+},
+{
+  "model": "gysdhChatApp.notice",
+  "pk": 6,
+  "fields": {
+    "content": "这个好像也对了",
+    "publisher": 1,
+    "is_active": false,
+    "timestamp": "2024-11-18T01:28:40.690Z"
+  }
+},
+{
+  "model": "gysdhChatApp.notice",
+  "pk": 7,
+  "fields": {
+    "content": "再试试注意事项",
+    "publisher": 1,
+    "is_active": true,
+    "timestamp": "2024-11-18T02:11:08.461Z"
+  }
+},
+{
+  "model": "gysdhChatApp.filedownloadlog",
+  "pk": 7,
+  "fields": {
+    "user": 1,
+    "file_name": "LINE_Chat_with_Danielle_otgyRHA.txt",
+    "file_type": "message",
+    "content_type": "text/plain",
+    "file_size": 26031,
+    "source_id": 365,
+    "downloaded_at": "2024-11-21T12:04:14.873Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0"
+  }
+},
+{
+  "model": "gysdhChatApp.filedownloadlog",
+  "pk": 8,
+  "fields": {
+    "user": 1,
+    "file_name": "LINE_Chat_with_Danielle.txt",
+    "file_type": "announcement",
+    "content_type": "text/plain",
+    "file_size": 26031,
+    "source_id": 163,
+    "downloaded_at": "2024-11-21T12:05:50.185Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0"
+  }
+},
+{
+  "model": "gysdhChatApp.filedownloadlog",
+  "pk": 9,
+  "fields": {
+    "user": 5,
+    "file_name": "LINE_Chat_with_Danielle_hFOQpbA.txt",
+    "file_type": "message",
+    "content_type": "text/plain",
+    "file_size": 26031,
+    "source_id": 373,
+    "downloaded_at": "2024-11-21T12:10:31.589Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:132.0) Gecko/20100101 Firefox/132.0"
+  }
+},
+{
+  "model": "gysdhChatApp.tag",
+  "pk": 1,
+  "fields": {
+    "name": "特殊人群",
+    "color": "#ec5f66",
+    "description": "不用理会礼节的人",
+    "created_at": "2024-11-25T11:34:43.470Z",
+    "created_by": 1
+  }
+},
+{
+  "model": "gysdhChatApp.tag",
+  "pk": 2,
+  "fields": {
+    "name": "高层领导",
+    "color": "#3b82f6",
+    "description": "就是高层领导",
+    "created_at": "2024-11-25T11:41:53.319Z",
+    "created_by": 1
+  }
+},
+{
+  "model": "gysdhChatApp.usertag",
+  "pk": 1,
+  "fields": {
+    "user": 4,
+    "tag": 1,
+    "added_at": "2024-11-25T11:41:00.598Z",
+    "added_by": 1
+  }
+},
+{
+  "model": "gysdhChatApp.usertag",
+  "pk": 2,
+  "fields": {
+    "user": 6,
+    "tag": 2,
+    "added_at": "2024-11-25T11:42:11.069Z",
+    "added_by": 1
+  }
+},
+{
+  "model": "gysdhChatApp.usertag",
+  "pk": 5,
+  "fields": {
+    "user": 5,
+    "tag": 1,
+    "added_at": "2024-11-25T12:09:26.090Z",
+    "added_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.usertag",
+  "pk": 6,
+  "fields": {
+    "user": 5,
+    "tag": 2,
+    "added_at": "2024-11-25T12:09:35.015Z",
+    "added_by": null
+  }
+},
+{
+  "model": "gysdhChatApp.systemsettings",
+  "pk": 1,
+  "fields": {
+    "chat_title": "GYSDH CHAT",
+    "chat_area_title": "CHAT",
+    "email_host": "smtp.qq.com",
+    "email_port": 587,
+    "email_host_user": "",
+    "email_host_password": "",
+    "email_use_tls": true,
+    "updated_at": "2024-11-24T13:39:29.158Z",
+    "updated_by": 1
+  }
+},
+{
+  "model": "gysdhChatApp.emailtemplate",
+  "pk": 6,
+  "fields": {
+    "name": "高层领导",
+    "subject": "admin@blazorchat.com",
+    "content": "<p>hhhhhh</p>",
+    "description": "dddd",
+    "variables": {
+      "name": "用户名"
+    },
+    "created_at": "2024-11-26T13:25:38.260Z",
+    "updated_at": "2024-11-26T13:25:38.260Z",
+    "created_by": 1
+  }
+}
+]

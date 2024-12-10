@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ conference.name }} - 会务信息{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                {{ conference.name }} - 会务信息
+            </h1>
+            <a href="{% url 'conference:detail' conference.id %}" class="flex items-center justify-center space-x-3 p-4 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 transition-colors text-blue-600 dark:text-blue-400">
+                <i class="fas fa-arrow-left text-xl"></i>
+                <span class="text-lg font-medium">返回详情</span>
+            </a>
+        </div>
+        
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- 会议日程 -->
+            
+            <!-- 晚宴座位 -->
+            
+        </div>
+        
+        <!-- 注意事项区域 -->
+        <div class="mt-auto p-6 border-t border-gray-200 dark:border-gray-700 bg-yellow-50 dark:bg-yellow-900/20 min-h-[200px] flex flex-col">
+            <div class="flex items-center space-x-2 text-yellow-800 dark:text-yellow-400 mb-4">
+                <i class="fas fa-exclamation-circle text-lg"></i>
+                <h3 class="font-medium text-lg">注意事项</h3>
+            </div>
+            {% if active_notice %}
+                <div class="text-sm text-yellow-700 dark:text-yellow-300 flex-1 prose prose-sm max-w-none dark:prose-invert prose-headings:text-yellow-800 dark:prose-headings:text-yellow-300 prose-a:text-yellow-600 dark:prose-a:text-yellow-400 overflow-y-auto">
+                    {{ active_notice.content|safe }}
+                </div>
+                <div class="mt-4 text-xs text-yellow-600 dark:text-yellow-400 flex items-center justify-between border-t border-yellow-200 dark:border-yellow-700 pt-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center text-white shadow-sm">
+                            <i class="fas fa-bell text-sm"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-medium">{{ active_notice.publisher.name }}</span>
+                            <span class="text-yellow-500 dark:text-yellow-400">{{ active_notice.timestamp|date:"Y-m-d H:i" }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-sm text-yellow-700 dark:text-yellow-300 flex-1 flex items-center justify-center">
+                    <p class="text-center">暂无注意事项</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- 参会状态 -->
+        {% if current_registration %}
+        <div>
+            <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+                <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+                    参会状态
+                </h2>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-400">报名状态</span>
+                        <span class="font-medium 
+                            {% if current_registration.status == '已确认' %}text-green-600 dark:text-green-400
+                            {% elif current_registration.status == '待确认' %}text-yellow-600 dark:text-yellow-400
+                            {% else %}text-red-600 dark:text-red-400
+                            {% endif %}">
+                            {{ current_registration.status|default:'未知' }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between border-t pt-2 dark:border-gray-700">
+                        <span class="text-gray-600 dark:text-gray-400">报名时间</span>
+                        <span class="font-medium text-gray-900 dark:text-gray-100">
+                            {{ current_registration.created_at|date:"Y-m-d H:i" }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 参会人列表 -->
+        {% if not current_registration %}
+        <div class="p-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+                参会人列表
+            </h2>
+            <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                姓名
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                邮箱
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                电话
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                报名时间
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        {% for registration in registrations %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {{ registration.participant.name }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ registration.participant.email }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ registration.participant.phone }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ registration.submitted_at|date:"Y-m-d H:i" }}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

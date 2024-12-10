@@ -1,0 +1,931 @@
+{% extends 'base.html' %}
+{% load filetags %}
+{% load custom_filters %}
+{% load chat_filters %}
+
+{% block content %}
+{% csrf_token %}
+<div class="flex h-screen bg-gray-50 dark:bg-gray-900">
+    {% include 'chat_sidebar.html' %}
+    <!-- 中间聊天区域 -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden">
+        <!-- 房间信息 -->
+        <div class="h-16 border-b border-gray-200 dark:border-gray-700 flex items-center px-6 bg-white dark:bg-gray-800 flex-shrink-0 shadow-sm">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-comments text-2xl text-blue-500"></i>
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-white">{{ settings.chat_area_title|default:"Pubablic Chat" }}</h2>
+            </div>
+        </div>
+
+        <!-- 消息区域 -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-white dark:bg-gray-900 flex flex-col-reverse" id="messages-container">
+            {% for message in messages reversed %}
+            {% if not message.is_private %}
+            <div class="flex {% if message.sender == request.user %}justify-end{% endif %}">
+                <div class="max-w-[70%]" data-message-id="{{ message.id }}">
+                    <!-- 发送者信息 -->
+                    <div class="flex items-center space-x-2 mb-1 {% if message.sender == request.user %}justify-end{% endif %}">
+                        {% if message.sender != request.user %}
+                        <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white">
+                            {{ message.sender.name|first }}
+                        </div>
+                        {% endif %}
+                        <span class="text-sm text-gray-600 dark:text-gray-400">{{ message.sender.name }}</span>
+                        <span class="text-gray-400 dark:text-gray-600">{{ message.timestamp|date:"Y-m-d H:i" }}</span>
+                    </div>
+
+                    <!-- 消息内容 -->
+                    <div class="flex-1 ml-4 message-content">
+                        {% if message.is_recalled %}
+                            <div class="text-gray-500 dark:text-gray-400 italic bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                <i class="fas fa-undo mr-1"></i>此消息已撤回
+                            </div>
+                        {% elif message.is_deleted %}
+                            <div class="text-gray-500 dark:text-gray-400 italic bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                <i class="fas fa-trash-alt mr-1"></i>此消息已被{% if message.deleted_by %}{{ message.deleted_by.name }}{% else %}管理员{% endif %}删除
+                            </div>
+                        {% else %}
+                            <div class="{% if message.sender == request.user %}bg-blue-500 text-white{% else %}bg-gray-100 text-gray-800{% endif %} rounded-lg p-3 shadow-sm">
+                                <!-- 主消息内容 -->
+                                <div>
+                                    <div>{{ message.content }}</div>
+                                    
+                                    {% if message.file %}
+                                    <div class="mt-2">
+                                        {% if message.file.name|is_image %}
+                                            <img src="{{ message.file.url }}" alt="上传的图片" class="max-w-full h-auto rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                                        {% else %}
+                                            <a href="{% url 'download_message_file' message.id %}" 
+                                               class="{% if message.sender == request.user %}text-blue-200 hover:text-white{% else %}text-blue-500 hover:text-blue-700{% endif %} flex items-center">
+                                                <i class="fas fa-paperclip"></i>
+                                                <span>{{ message.file.name }}</span>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- 消息操作按钮 -->
+                                <div class="flex items-center space-x-2 text-xs {% if message.sender == request.user %}text-blue-200{% else %}text-gray-500{% endif %} mt-2">
+                                    <!-- <span>{{ message.timestamp|timesince_minutes }}</span> -->
+                                    {% if message.sender == request.user or request.user.is_admin %}
+                                        {% if message.timestamp|timesince_minutes|floatformat:0|add:0 <= 2 or request.user.is_admin %}
+                                            <button onclick="recallMessage({{ message.id }})" class="hover:text-blue-600">
+                                                <i class="fas fa-undo mr-1"></i>撤回
+                                            </button>
+                                        {% endif %}
+                                    {% endif %}
+                                    {% if request.user.is_admin or request.user.is_event_staff %}
+                                        <button onclick="deleteMessage({{ message.id }})" class="hover:text-red-600">
+                                            <i class="fas fa-trash-alt mr-1"></i>删除
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- 时间显示 -->
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 {% if message.sender == request.user %}text-right{% endif %}">
+                        <!-- {{ message.timestamp|date:"Y-m-d H:i:s" }} -->
+                        {% if message.is_recalled %}
+                            (已撤回)
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            <div id="latest"></div>
+        </div>
+
+        <!-- 输入区域 -->
+        <div class="border-t border-gray-200/50 dark:border-gray-700/50 p-4 bg-gradient-to-b from-white dark:from-gray-800 to-gray-50/30 dark:to-gray-800/30 backdrop-blur-sm flex-shrink-0">
+            <form method="post" enctype="multipart/form-data" class="space-y-4">
+                {% csrf_token %}
+                <div class="flex space-x-4 items-start">
+                    <div class="flex-grow">
+                        <label>
+                            <textarea name="content" class="w-full px-4 py-3 border-0 rounded-xl bg-gradient-to-br from-purple-50 to-blue-50 hover:from-purple-100 hover:to-blue-100 focus:ring-2 focus:ring-purple-400/50 shadow-[0_0_10px_rgba(0,0,0,0.05)] hover:shadow-[0_0_15px_rgba(0,0,0,0.1)] focus:shadow-[0_0_20px_rgba(147,51,234,0.2)] outline-none transition-all duration-200 resize-none" rows="3" placeholder="输入消息..."></textarea>
+                        </label>
+                        <!-- 添加文件上传提示区域 -->
+                        <div id="file-upload-info" class="hidden mt-2 px-3 py-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg text-sm text-gray-600 dark:text-gray-400 flex items-center space-x-2 border border-purple-100 dark:border-purple-700">
+                            <i class="fas fa-file text-purple-500"></i>
+                            <span id="uploaded-filename" class="truncate"></span>
+                            <button onclick="removeUploadedFile()" class="text-gray-400 dark:text-gray-600 hover:text-red-500 focus:outline-none transition-colors duration-200">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0 space-y-4">
+                        <div class="flex space-x-4">
+                            <label class="cursor-pointer p-3 text-lg flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 active:scale-95">
+                                <i class="fas fa-paperclip"></i>
+                                <input type="file" name="file" class="hidden" onchange="updateFileLabel(this)">
+                            </label>
+                            <button type="submit" class="p-3 text-lg flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 active:scale-95">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            {% if request.user.can_publish_announcements %}
+                            <label class="flex items-center space-x-2 cursor-pointer group">
+                                <input type="checkbox" name="announcement_toggle" class="hidden">
+                                <span class="toggle-switch bg-gradient-to-r from-purple-500/80 to-blue-500/80 group-hover:from-purple-600 group-hover:to-blue-600"></span>
+                                <span class="text-sm text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-300 transition-colors duration-200">公告</span>
+                            </label>
+                            {% endif %}
+                            {% if request.user.can_private_message %}
+                            <label class="flex items-center space-x-2 cursor-pointer group">
+                                <input type="checkbox" name="private_message_toggle" class="hidden">
+                                <span class="toggle-switch bg-gradient-to-r from-purple-500/80 to-blue-500/80 group-hover:from-purple-600 group-hover:to-blue-600"></span>
+                                <span class="text-sm text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-300 transition-colors duration-200">私密</span>
+                            </label>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 右侧窗口 -->
+    <div class="w-96 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col h-screen overflow-hidden">
+        <!-- 公告窗口 -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden flex-1 flex flex-col mb-4">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-4 font-semibold flex items-center space-x-2">
+                <i class="fas fa-bullhorn text-xl"></i>
+                <span class="text-lg">公告</span>
+            </div>
+            <div class="p-6 flex-1 overflow-y-auto">
+                {% if announcements %}
+                    {% for announcement in announcements %}
+                        <div class="mb-8 last:mb-0 {% if announcement.is_sticky %}bg-yellow-50 dark:bg-yellow-900/10 p-4 rounded-lg border border-yellow-100 dark:border-yellow-900/20{% endif %}">
+                            <div class="announcement-content prose prose-sm max-w-none">
+                                <div class="mb-2 flex flex-wrap items-center gap-2">
+                                    {% if announcement.is_sticky %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+                                        <i class="fas fa-thumbtack mr-1"></i>置顶
+                                    </span>
+                                    {% endif %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                        {% if announcement.priority == 4 %}
+                                            bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300
+                                        {% elif announcement.priority == 3 %}
+                                            bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300
+                                        {% elif announcement.priority == 2 %}
+                                            bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300
+                                        {% else %}
+                                            bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300
+                                        {% endif %}
+                                    ">
+                                        <i class="fas fa-flag mr-1"></i>{{ announcement.get_priority_display }}级
+                                    </span>
+                                    {% if announcement.expires_at %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
+                                        <i class="fas fa-clock mr-1"></i>{{ announcement.expires_at|date:"Y-m-d H:i" }}过期
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                {{ announcement.content|safe }}
+                                {% if announcement.file %}
+                                    {% if announcement.file.name|is_image %}
+                                        <div class="mt-2">
+                                            <img src="{{ announcement.file.url }}" alt="公告图片" class="max-w-full h-auto rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                                        </div>
+                                    {% endif %}
+                                    <div class="mt-2 p-2 bg-white dark:bg-gray-700 bg-opacity-20 rounded">
+                                        <a href="/download/announcement/{{ announcement.id }}/" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-500 flex items-center" target="_blank" download>
+                                            <i class="fas fa-paperclip"></i>
+                                            <span>{{ announcement.file.name }}</span>
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-700 pt-4">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white shadow-sm">
+                                        <i class="fas fa-user text-sm"></i>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="font-medium text-gray-700 dark:text-gray-300">{{ announcement.publisher.name }}</span>
+                                        <span class="text-gray-400 dark:text-gray-600">{{ announcement.timestamp|date:"Y-m-d H:i" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="flex items-center justify-center h-full text-gray-400 dark:text-gray-600">
+                        <p>暂无公告</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 私密消息窗口 -->
+        <div class="flex-1 flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden" id="private-message-area">
+            <!-- 私密消息标题 -->
+            <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-6 py-4 font-semibold flex items-center space-x-2">
+                <i class="fas fa-lock text-xl"></i>
+                <span class="text-lg">私密消息</span>
+            </div>
+            <!-- 私密消息列表 -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col-reverse" id="private-message-list">
+                {% for message in private_messages reversed %}
+                <div class="mb-4 {% if message.sender == user %}flex flex-row-reverse{% else %}flex{% endif %}">
+                    <div class="{% if message.sender == user %}bg-purple-100 text-purple-900{% else %}bg-gray-100 text-gray-900{% endif %} rounded-lg px-4 py-2 max-w-[70%] break-words shadow-sm relative group" data-message-id="{{ message.id }}">
+                        <!-- 发送者信息 -->
+                        <div class="flex items-center {% if message.sender == user %}justify-end{% endif %} mb-1 text-sm text-gray-600 dark:text-gray-400">
+                            <span class="font-semibold">{{ message.sender.name }}</span>
+                            <span class="mx-2">•</span>
+                            <span>{{ message.timestamp|date:"Y-m-d H:i" }}</span>
+                        </div>
+
+                        <!-- 如果是回复消息，显示被回复的消息 -->
+                        {% if message.reply_to %}
+                        <div class="mb-2 p-2 bg-white dark:bg-gray-700 bg-opacity-50 rounded text-sm">
+                            <div class="text-gray-500 dark:text-gray-400">回复 {{ message.reply_to.sender.name }}:</div>
+                            <div class="text-gray-700 dark:text-gray-300">{{ message.reply_to.content|truncatechars:50 }}</div>
+                        </div>
+                        {% endif %}
+
+                        <!-- 消息内容 -->
+                        <div class="message-content mb-1">{{ message.content }}</div>
+
+                        <!-- 如果有文件，显示文件 -->
+                        {% if message.file %}
+                        <div class="mt-2">
+                            {% if message.file|is_image %}
+                            <img src="{{ message.file.url }}" alt="Uploaded Image" class="max-w-full h-auto rounded">
+                            {% else %}
+                            <a href="/download/message/{{ message.id }}/" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-500 flex items-center" target="_blank" download>
+                                <i class="fas fa-paperclip"></i>
+                                <span>{{ message.file.name }}</span>
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <!-- 回复按钮 -->
+                        <button onclick="showReplyWindow('{{ message.id }}')" 
+                                class="opacity-0 group-hover:opacity-100 absolute {% if message.sender == user %}-left-16{% else %}-right-16{% endif %} top-0 p-2 rounded-full bg-gradient-to-r from-purple-500/80 to-blue-500/80 text-white hover:from-purple-600 hover:to-blue-600 hover:scale-110 transform transition-all duration-300 shadow-md hover:shadow-lg">
+                            <i class="fas fa-reply"></i>
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 浮动回复窗口 -->
+    <div class="hidden fixed inset-0 bg-gradient-to-br from-purple-500/30 to-blue-500/30 backdrop-blur-sm flex items-center justify-center z-50" id="floating-reply-window">
+        <div class="bg-white dark:bg-gray-800/95 rounded-2xl shadow-2xl w-96 p-6 border border-white/20 dark:border-gray-700/20 backdrop-blur-md transform transition-all duration-300 hover:scale-[1.02]">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent" id="message-header"></h3>
+                <button onclick="hideFloatingReplyWindow()" 
+                        class="text-gray-400 dark:text-gray-600 hover:text-red-500 focus:outline-none transition-colors duration-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <label for="floating-reply-input"></label><textarea id="floating-reply-input"
+                                                                    class="w-full p-3 border-0 rounded-xl bg-gradient-to-br from-purple-50 to-blue-50 hover:from-purple-100 hover:to-blue-100 focus:ring-2 focus:ring-purple-400/50 shadow-[0_0_10px_rgba(0,0,0,0.05)] hover:shadow-[0_0_15px_rgba(0,0,0,0.1)] focus:shadow-[0_0_20px_rgba(147,51,234,0.2)] outline-none transition-all duration-200 resize-none" rows="4"
+                                                                    placeholder="输入回复内容..."></textarea>
+                <div class="flex items-center space-x-4">
+                    <label class="flex-1 cursor-pointer text-center px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105 active:scale-95">
+                        <i class="fas fa-paperclip"></i>
+                        <input type="file" id="floating-file-input" class="hidden">
+                    </label>
+                    <button onclick="submitReply()" class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transition-all duration-300 shadow-md hover:shadow-lg active:scale-95">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // WebSocket连接
+        const chatSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/chat/lobby/'
+        );
+
+        // 使用防抖函数优化滚动
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 如果URL中有#latest，移除它
+            if (window.location.hash === '#latest') {
+                window.location.hash = '';
+            }
+        });
+
+        // 使用requestAnimationFrame优化DOM更新
+        function updateDOM(callback) {
+            window.requestAnimationFrame(() => {
+                callback();
+            });
+        }
+
+        // 优化的消息添加函数
+        function appendPublicMessage(message) {
+            updateDOM(() => {
+                const messageContainer = document.getElementById('messages-container');
+                const isCurrentUser = message.sender_id === {{ user.id }};
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `flex ${isCurrentUser ? 'justify-end' : ''}`;
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'max-w-[70%]';
+                messageContent.setAttribute('data-message-id', message.id);
+                
+                // 使用DocumentFragment优化DOM操作
+                const fragment = document.createDocumentFragment();
+                
+                // 发送者信息
+                const senderInfo = document.createElement('div');
+                senderInfo.className = `flex items-center space-x-2 mb-1 ${isCurrentUser ? 'justify-end' : ''}`;
+                
+                if (!isCurrentUser) {
+                    const avatar = document.createElement('div');
+                    avatar.className = 'w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white';
+                    avatar.textContent = message.sender_name.charAt(0);
+                    senderInfo.appendChild(avatar);
+                }
+                
+                const senderName = document.createElement('span');
+                senderName.className = 'text-sm text-gray-600 dark:text-gray-400';
+                senderName.textContent = message.sender_name;
+                senderInfo.appendChild(senderName);
+
+                // 添加时间戳
+                const timestamp = document.createElement('span');
+                timestamp.className = 'text-sm text-gray-500 dark:text-gray-400 ml-2';
+                timestamp.textContent = formatTimestamp(message.timestamp);
+                senderInfo.appendChild(timestamp);
+                
+                fragment.appendChild(senderInfo);
+                
+                // 消息内容
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'flex-1 ml-4 message-content';
+                contentDiv.innerHTML = `<div class="bg-white dark:bg-gray-700 p-3 rounded-lg shadow-sm">${message.content}</div>`;
+                
+                fragment.appendChild(contentDiv);
+                messageContent.appendChild(fragment);
+                messageDiv.appendChild(messageContent);
+                
+                const latestDiv = document.getElementById('latest');
+                messageContainer.insertBefore(messageDiv, latestDiv);
+            });
+        }
+
+        function appendPrivateMessage(message) {
+            updateDOM(() => {
+                const messageContainer = document.getElementById('private-message-list');
+                const isCurrentUser = message.sender_id === {{ user.id }};
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `mb-4 ${isCurrentUser ? 'flex flex-row-reverse' : 'flex'}`;
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = `${isCurrentUser ? 'bg-purple-100 text-purple-900' : 'bg-gray-100 text-gray-900'} rounded-lg px-4 py-2 max-w-[70%] break-words shadow-sm relative group`;
+                messageContent.setAttribute('data-message-id', message.id);
+                
+                // 使用DocumentFragment优化DOM操作
+                const fragment = document.createDocumentFragment();
+                
+                // 发送者信息
+                const senderInfo = document.createElement('div');
+                senderInfo.className = `flex items-center ${isCurrentUser ? 'justify-end' : ''} mb-1 text-sm text-gray-600 dark:text-gray-400`;
+                
+                const senderName = document.createElement('span');
+                senderName.className = 'font-semibold';
+                senderName.textContent = message.sender_name;
+                
+                const dot = document.createElement('span');
+                dot.className = 'mx-2';
+                dot.textContent = '•';
+                
+                const timestamp = document.createElement('span');
+                timestamp.textContent = new Date().toLocaleString();
+                
+                fragment.appendChild(senderName);
+                fragment.appendChild(dot);
+                fragment.appendChild(timestamp);
+                senderInfo.appendChild(fragment);
+                
+                messageContent.appendChild(senderInfo);
+                
+                // 消息内容
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content mb-1';
+                contentDiv.textContent = message.content;
+                
+                messageContent.appendChild(contentDiv);
+                messageDiv.appendChild(messageContent);
+                messageContainer.appendChild(messageDiv);
+            });
+        }
+
+        // 优化WebSocket消息处理
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            switch (data.type) {
+                case 'chat_message':
+                    // 处理新消息
+                    const message = data.message;
+                    if (message.is_private) {
+                        appendPrivateMessage(message);
+                    } else {
+                        appendPublicMessage(message);
+                    }
+                    break;
+                    
+                case 'message_status':
+                    // 处理消息状态更新
+                    updateDOM(() => {
+                        const messageId = data.message_id;
+                        const status = data.status;
+                        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+                        
+                        if (messageElement) {
+                            const contentDiv = messageElement.querySelector('.message-content');
+                            const actionsDiv = messageElement.querySelector('.message-actions');
+                            
+                            if (status === 'recalled') {
+                                contentDiv.innerHTML = '<div class="text-gray-500 dark:text-gray-400 italic bg-gray-100 dark:bg-gray-700 p-3 rounded-lg"><i class="fas fa-undo mr-1"></i>此消息已撤回</div>';
+                            } else if (status === 'deleted') {
+                                contentDiv.innerHTML = '<div class="text-gray-500 dark:text-gray-400 italic bg-gray-100 dark:bg-gray-700 p-3 rounded-lg"><i class="fas fa-trash-alt mr-1"></i>此消息已被{% if message.deleted_by %}{{ message.deleted_by.name }}{% else %}管理员{% endif %}删除</div>';
+                            }
+                            
+                            if (actionsDiv) {
+                                actionsDiv.remove();
+                            }
+                        }
+                    });
+                    break;
+                    
+                case 'user_status':
+                    // 处理用户状态更新
+                    updateDOM(() => {
+                        updateUserStatus(data.user_id, data.status);
+                    });
+                    break;
+            }
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        // 发送消息的函数
+        function sendMessage(content, isPrivate = false, recipientId = null, replyToId = null) {
+            const fileInput = document.querySelector('input[type="file"]');
+            const file = fileInput ? fileInput.files[0] : null;
+            
+            // 如果有文件，先处理文件
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const fileData = {
+                        name: file.name,
+                        content: e.target.result
+                    };
+                    
+                    // 发送消息和文件数据
+                    chatSocket.send(JSON.stringify({
+                        'type': 'chat_message',
+                        'content': content,
+                        'sender_id': {{ user.id }},
+                        'is_private': isPrivate,
+                        'recipient_id': recipientId,
+                        'reply_to_id': replyToId,
+                        'file': fileData
+                    }));
+                    
+                    // 清除文件输入
+                    fileInput.value = '';
+                    const fileUploadInfo = document.getElementById('file-upload-info');
+                    if (fileUploadInfo) {
+                        fileUploadInfo.classList.add('hidden');
+                    }
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // 没有文件，直接发送消息
+                chatSocket.send(JSON.stringify({
+                    'type': 'chat_message',
+                    'content': content,
+                    'sender_id': {{ user.id }},
+                    'is_private': isPrivate,
+                    'recipient_id': recipientId,
+                    'reply_to_id': replyToId
+                }));
+            }
+        }
+
+        // 修改现有的createMessageHTML函数
+        function createMessageHTML(message) {
+            const isCurrentUser = message.sender_id === {{ user.id }};
+            const alignClass = isCurrentUser ? 'justify-end' : '';
+            const messageClass = isCurrentUser ? 'bg-blue-500 text-white' : 'bg-indigo-100 text-gray-800';
+            const formattedTime = formatTimestamp(message.timestamp);
+            
+            let fileHTML = '';
+            if (message.file) {
+                if (message.file.toLowerCase().endsWith('.jpg') || 
+                    message.file.toLowerCase().endsWith('.jpeg') || 
+                    message.file.toLowerCase().endsWith('.png') || 
+                    message.file.toLowerCase().endsWith('.gif')) {
+                    fileHTML = `
+                        <div class="mt-2">
+                            <img src="${message.file}" alt="上传的图片" class="max-w-full h-auto rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                        </div>
+                    `;
+                }
+                fileHTML += `
+                    <div class="mt-2 p-2 bg-white dark:bg-gray-700 bg-opacity-20 rounded">
+                        <a href="/download/message/${message.id}/" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-500 flex items-center" target="_blank" download>
+                            <i class="fas fa-paperclip"></i>
+                            <span>${message.file_name}</span>
+                        </a>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="flex ${alignClass}">
+                    <div class="flex flex-col max-w-[70%]">
+                        <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 mb-1 ${isCurrentUser ? 'justify-end' : ''}">
+                            ${isCurrentUser ? '' : `
+                            <div class="relative">
+                                <div class="w-8 h-8 rounded-full bg-indigo-500 to-indigo-600 flex items-center justify-center text-white shadow-sm">
+                                    <span class="text-sm font-medium">${message.sender_name.charAt(0).toUpperCase()}</span>
+                                </div>
+                            </div>
+                            `}
+                            <span class="font-medium">${message.sender_name}</span>
+                            <span class="text-gray-500 dark:text-gray-400">${formattedTime}</span>
+                            ${isCurrentUser ? `
+                            <div class="relative ml-2">
+                                <div class="w-8 h-8 rounded-full bg-blue-400 to-blue-600 flex items-center justify-center text-white shadow-sm">
+                                    <span class="text-sm font-medium">${message.sender_name.charAt(0).toUpperCase()}</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                        </div>
+                        <div class="${messageClass} rounded-lg p-3 shadow-sm">
+                            ${message.content ? `<div>${message.content}</div>` : ''}
+                            ${fileHTML}
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 ${isCurrentUser ? 'text-right' : ''}">
+                            ${message.timestamp}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 添加消息到DOM的辅助函数
+        function appendMessage(message) {
+            const messageContainer = document.getElementById('messages-container');
+            const isCurrentUser = message.sender_id === {{ user.id }};
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${isCurrentUser ? 'justify-end' : ''}`;
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'max-w-[70%]';
+            messageContent.setAttribute('data-message-id', message.id);
+            
+            // 使用DocumentFragment优化DOM操作
+            const fragment = document.createDocumentFragment();
+            
+            // 发送者信息
+            const senderInfo = document.createElement('div');
+            senderInfo.className = `flex items-center space-x-2 mb-1 ${isCurrentUser ? 'justify-end' : ''}`;
+            
+            if (!isCurrentUser) {
+                const avatar = document.createElement('div');
+                avatar.className = 'w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white';
+                avatar.textContent = message.sender_name.charAt(0);
+                senderInfo.appendChild(avatar);
+            }
+            
+            const senderName = document.createElement('span');
+            senderName.className = 'text-sm text-gray-600 dark:text-gray-400';
+            senderName.textContent = message.sender_name;
+            senderInfo.appendChild(senderName);
+            
+            fragment.appendChild(senderInfo);
+            
+            // 消息内容
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'flex-1 ml-4 message-content';
+            contentDiv.innerHTML = `<div class="bg-white dark:bg-gray-700 p-3 rounded-lg shadow-sm">${message.content}</div>`;
+            
+            fragment.appendChild(contentDiv);
+            messageContent.appendChild(fragment);
+            messageDiv.appendChild(messageContent);
+            messageContainer.appendChild(messageDiv);
+        }
+
+        // 格式化时间戳的函数
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp * 1000);
+            const now = new Date();
+            const yesterday = new Date(now);
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            // 格式化时间部分
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const timeStr = `${hours}:${minutes}`;
+            
+            // 如果是今天的消息
+            if (date.toDateString() === now.toDateString()) {
+                return `今天 ${timeStr}`;
+            }
+            // 如果是昨天的消息
+            else if (date.toDateString() === yesterday.toDateString()) {
+                return `昨天 ${timeStr}`;
+            }
+            // 其他日期
+            else {
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const day = date.getDate().toString().padStart(2, '0');
+                return `${month}-${day} ${timeStr}`;
+            }
+        }
+
+        // 文件上传预览
+        const fileInputs = document.querySelectorAll('input[type="file"]');
+        fileInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const button = this.parentElement;
+                    button.classList.add('text-primary');
+                    button.title = file.name;
+                }
+            });
+        });
+
+        // 开关按钮处理
+        const announcementToggle = document.querySelector('input[name="announcement_toggle"]');
+        const privateMessageToggle = document.querySelector('input[name="private_message_toggle"]');
+
+        if (announcementToggle) {
+            announcementToggle.addEventListener('change', function() {
+                if (this.checked && privateMessageToggle) {
+                    privateMessageToggle.checked = false;
+                }
+            });
+        }
+
+        if (privateMessageToggle) {
+            privateMessageToggle.addEventListener('change', function() {
+                if (this.checked && announcementToggle) {
+                    announcementToggle.checked = false;
+                }
+            });
+        }
+
+        // 回复窗口相关功能
+        let currentMessageId = null;
+
+        function showReplyWindow(messageId) {
+            currentMessageId = messageId;
+            const floatingWindow = document.getElementById('floating-reply-window');
+            const messageHeader = document.getElementById('message-header');
+            
+            messageHeader.textContent = '回复消息 #' + messageId;
+            floatingWindow.classList.remove('hidden');
+            
+            document.getElementById('floating-reply-input').value = '';
+            document.getElementById('floating-file-input').value = '';
+        }
+
+        function hideFloatingReplyWindow() {
+            const floatingWindow = document.getElementById('floating-reply-window');
+            floatingWindow.classList.add('hidden');
+            currentMessageId = null;
+            document.getElementById('floating-reply-input').value = '';
+            document.getElementById('floating-file-input').value = '';
+        }
+
+        function submitReply() {
+            if (!currentMessageId) return;
+            
+            const replyContent = document.getElementById('floating-reply-input').value;
+            const fileInput = document.getElementById('floating-file-input');
+            
+            if (!replyContent.trim() && !fileInput.files[0]) {
+                alert('请输入消息或选择文件');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('content', replyContent);
+            formData.append('reply_to', currentMessageId);
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+            
+            if (fileInput.files[0]) {
+                formData.append('file', fileInput.files[0]);
+            }
+            
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('floating-reply-window').style.display = 'none';
+                    location.reload();
+                } else {
+                    alert(data.message || '发送失败');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('发送失败，请重试');
+            });
+        }
+
+        function showReplyForm(sender, content, messageId) {
+            const replyForm = document.getElementById('reply-form');
+            const replyTo = document.getElementById('reply-to');
+            const originalMessage = document.getElementById('original-message');
+            
+            replyTo.textContent = sender;
+            originalMessage.textContent = content;
+            replyForm.dataset.messageId = messageId;  // 存储消息ID
+            replyForm.style.display = 'flex';
+        }
+
+        function hideReplyForm() {
+            const replyForm = document.getElementById('reply-form');
+            replyForm.style.display = 'none';
+        }
+
+        function submitPrivateReply(event) {
+            event.preventDefault();
+            
+            const replyContent = document.getElementById('reply-content').value;
+            const replyFile = document.getElementById('reply-file').files[0];
+            const replyForm = document.getElementById('reply-form');
+            const messageId = replyForm.dataset.messageId;  // 获取消息ID
+            
+            if (!replyContent.trim() && !replyFile) {
+                alert('请输入回复内容或选择文件');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('content', replyContent);
+            formData.append('reply_to', messageId);  // 使用消息ID
+            formData.append('private_message_toggle', 'on');
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+            
+            if (replyFile) {
+                formData.append('file', replyFile);
+            }
+            
+            const pathParts = window.location.pathname.split('/');
+            const userId = pathParts[pathParts.length - 2];
+            
+            fetch(`/chat/${userId}/`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data) return;  // 如果已经重定向，data将是undefined
+                if (data.status === 'success') {
+                    hideReplyForm();
+                    location.reload();
+                } else {
+                    alert(data.message || '发送失败');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('发送失败，请重试');
+            });
+        }
+
+        function updateFileLabel(input, labelId) {
+            const label = document.getElementById(labelId);
+            if (input.files && input.files[0]) {
+                label.innerHTML = `<i class="fas fa-paperclip mr-2"></i>${input.files[0].name}`;
+            } else {
+                label.innerHTML = `<i class="fas fa-paperclip mr-2"></i>添加附件`;
+            }
+        }
+
+        function updateFileLabel(input) {
+            const fileInfo = document.getElementById('file-upload-info');
+            const filenameSpan = document.getElementById('uploaded-filename');
+            
+            if (input.files && input.files[0]) {
+                const fileName = input.files[0].name;
+                filenameSpan.textContent = fileName;
+                fileInfo.classList.remove('hidden');
+            } else {
+                fileInfo.classList.add('hidden');
+            }
+        }
+
+        function removeUploadedFile() {
+            const fileInput = document.querySelector('input[type="file"]');
+            const fileInfo = document.getElementById('file-upload-info');
+            
+            fileInput.value = '';
+            fileInfo.classList.add('hidden');
+        }
+
+        function recallMessage(messageId) {
+            if (!confirm('确定要撤回这条消息吗？')) {
+                return;
+            }
+            
+            // 获取 CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            fetch(`/message/recall/${messageId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin'  // 包含 cookies
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    // 刷新页面显示撤回状态
+                    location.reload();
+                } else {
+                    alert(data.message || '撤回失败');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('撤回失败，请稍后重试');
+            });
+        }
+
+        function deleteMessage(messageId) {
+            if (!confirm('确定要删除这条消息吗？此操作不可撤销。')) {
+                return;
+            }
+            
+            fetch(`/message/delete/${messageId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    alert(data.message || '删除失败');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('删除失败，请稍后重试');
+            });
+        }
+    </script>
+{% endblock %}

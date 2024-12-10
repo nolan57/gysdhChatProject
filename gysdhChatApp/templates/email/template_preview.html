@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 页面标题 -->
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center">
+                <i class="fas fa-eye text-indigo-600 dark:text-indigo-400 text-4xl mr-4"></i>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">预览邮件模板</h1>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-6">
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">模板名称</label>
+                        <p class="form-control-static text-gray-900 dark:text-gray-300">{{ template.name }}</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">创建时间</label>
+                        <p class="form-control-static text-gray-900 dark:text-gray-300">{{ template.created_at|date:"Y-m-d H:i" }}</p>
+                    </div>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">邮件主题</label>
+                    <p class="form-control-static text-gray-900 dark:text-gray-300">{{ template.subject }}</p>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">模板描述</label>
+                    <p class="form-control-static text-gray-900 dark:text-gray-300">{{ template.description }}</p>
+                </div>
+
+                {% if sample_variables %}
+                <div class="form-group mt-3">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">模板变量</label>
+                    <div class="table-responsive">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-900">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">变量名</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">示例值</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                {% for key, value in sample_variables.items %}
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">{{ key }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">{{ value }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="form-group mt-3">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">原始内容</label>
+                    <pre class="form-control text-gray-900 dark:text-gray-300" style="min-height: 150px;">{{ template.content }}</pre>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">渲染后的内容</label>
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-md shadow-md">
+                        <div class="text-gray-900 dark:text-gray-300">{{ rendered_content|safe }}</div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end mt-6">
+                    <a href="{% url 'template_list' %}" class="inline-flex justify-center items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200">
+                        返回
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

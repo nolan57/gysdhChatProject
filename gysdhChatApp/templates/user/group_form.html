@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form.instance.pk %}编辑用户组{% else %}新增用户组{% endif %} - GYSDH CHAT{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-6">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex items-center mb-6">
+                    <i class="fas {% if form.instance.pk %}fa-edit{% else %}fa-plus{% endif %} text-indigo-600 dark:text-indigo-400 text-3xl mr-4"></i>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                        {% if form.instance.pk %}
+                        编辑用户组
+                        {% else %}
+                        新增用户组
+                        {% endif %}
+                    </h1>
+                </div>
+
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="rounded-md bg-red-50 dark:bg-red-900/30 p-4 mb-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-circle text-red-400 dark:text-red-300"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800 dark:text-red-300">
+                                    表单验证错误
+                                </h3>
+                                <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                                    {{ form.non_field_errors }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="space-y-4">
+                        <!-- 组名 -->
+                        <div>
+                            <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                {{ form.name.label }}
+                            </label>
+                            <div class="mt-1">
+                                {{ form.name|addclass:"block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-500 focus:ring-opacity-50" }}
+                                {% if form.name.errors %}
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">
+                                    {{ form.name.errors.0 }}
+                                </p>
+                                {% endif %}
+                                {% if form.name.help_text %}
+                                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                    {{ form.name.help_text }}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- 描述 -->
+                        <div>
+                            <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                {{ form.description.label }}
+                            </label>
+                            <div class="mt-1">
+                                {{ form.description|addclass:"block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-500 focus:ring-opacity-50" }}
+                                {% if form.description.errors %}
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">
+                                    {{ form.description.errors.0 }}
+                                </p>
+                                {% endif %}
+                                {% if form.description.help_text %}
+                                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                    {{ form.description.help_text }}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-600">
+                        <a href="{% url 'group_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
+                            取消
+                        </a>
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:from-indigo-500 dark:to-purple-500 dark:hover:from-indigo-600 dark:hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
+                            {% if form.instance.pk %}保存修改{% else %}创建用户组{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

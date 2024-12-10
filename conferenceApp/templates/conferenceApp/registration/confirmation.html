@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                    
+                    <h3 class="mt-4">报名提交成功</h3>
+                    <p class="text-muted">
+                        您已成功提交 {{ registration.conference.name }} 的报名申请
+                    </p>
+                    
+                    <div class="alert alert-info">
+                        <h5>报名信息</h5>
+                        <p class="mb-1">报名编号：{{ registration.participant.registration_number }}</p>
+                        <p class="mb-1">提交时间：{{ registration.created_at|date:"Y-m-d H:i" }}</p>
+                        <p class="mb-1">当前状态：{{ registration.get_status_display }}</p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>参会人信息</h5>
+                        <table class="table">
+                            <tr>
+                                <th>姓名</th>
+                                <td>{{ registration.participant.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>公司</th>
+                                <td>{{ registration.participant.company.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>职位</th>
+                                <td>{{ registration.participant.position }}</td>
+                            </tr>
+                            <tr>
+                                <th>联系电话</th>
+                                <td>{{ registration.participant.phone }}</td>
+                            </tr>
+                            <tr>
+                                <th>电子邮箱</th>
+                                <td>{{ registration.participant.email }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    {% if registration.answers.exists %}
+                    <div class="mt-4">
+                        <h5>其他信息</h5>
+                        <table class="table">
+                            {% for answer in registration.answers.all %}
+                            <tr>
+                                <th>{{ answer.field.label }}</th>
+                                <td>{{ answer.value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'conference_detail' pk=registration.conference.id %}" 
+                           class="btn btn-primary">
+                            返回会议详情
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

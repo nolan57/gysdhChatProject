@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>文件下载记录</h2>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>下载时间</th>
+                            <th>用户</th>
+                            <th>文件名</th>
+                            <th>文件类型</th>
+                            <th>文件大小</th>
+                            <th>IP地址</th>
+                            <th>浏览器信息</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td>{{ log.downloaded_at|date:"Y-m-d H:i:s" }}</td>
+                            <td>{{ log.user.name }} ({{ log.user.number }})</td>
+                            <td>{{ log.file_name }}</td>
+                            <td>
+                                {% if log.file_type == 'message' %}
+                                    消息文件
+                                {% elif log.file_type == 'announcement' %}
+                                    公告文件
+                                {% else %}
+                                    {{ log.file_type }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if log.file_size < 1024 %}
+                                    {{ log.file_size }} B
+                                {% elif log.file_size < 1048576 %}
+                                    {{ log.file_size|divisibleby:1024|floatformat:1 }} KB
+                                {% else %}
+                                    {{ log.file_size|divisibleby:1048576|floatformat:1 }} MB
+                                {% endif %}
+                            </td>
+                            <td>{{ log.ip_address }}</td>
+                            <td>
+                                <span class="text-truncate d-inline-block" style="max-width: 200px;" title="{{ log.user_agent }}">
+                                    {{ log.user_agent }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">暂无下载记录</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-responsive {
+        overflow-x: auto;
+    }
+    .table th, .table td {
+        white-space: nowrap;
+        padding: 8px;
+    }
+    .text-truncate {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
+{% endblock %}

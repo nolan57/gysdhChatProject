@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load tailwind_filters %}
+
+{% block title %}{{ conference.name }} - 会议详情{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 dark:bg-gray-900">
+    <!-- 顶部状态栏 -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <a href="{% url 'conference:list' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
+                    <i class="fas fa-arrow-left"></i>
+                    <span class="ml-2">返回列表</span>
+                </a>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ conference.name }}</h1>
+            </div>
+            <span class="px-4 py-2 rounded-full text-sm font-semibold 
+                {% if conference.status == 'draft' %}bg-gray-200 text-gray-800
+                {% elif conference.status == 'published' %}bg-blue-200 text-blue-800
+                {% elif conference.status == 'registration' %}bg-green-200 text-green-800
+                {% elif conference.status == 'registration_ended' %}bg-yellow-200 text-yellow-800
+                {% elif conference.status == 'check_in' %}bg-purple-200 text-purple-800
+                {% elif conference.status == 'in_progress' %}bg-indigo-200 text-indigo-800
+                {% elif conference.status == 'completed' %}bg-gray-200 text-gray-800
+                {% else %}bg-red-200 text-red-800{% endif %}">
+                {{ conference.get_status_display }}
+            </span>
+        </div>
+    </div>
+
+    <!-- 主要内容区 -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- 左侧信息栏 -->
+        <div class="md:col-span-2 space-y-6">
+            <!-- 基本信息 -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">基本信息</h2>
+                <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">会议代码</dt>
+                        <dd class="text-base text-gray-900 dark:text-white">{{ conference.code }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">主办方</dt>
+                        <dd class="text-base text-gray-900 dark:text-white">{{ conference.organizer }}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <!-- 时间信息 -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">时间安排</h2>
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <div class="w-1/3">
+                            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">会议时间</span>
+                        </div>
+                        <div class="w-2/3">
+                            <p class="text-base text-gray-900 dark:text-white">
+                                {{ conference.start_date|date:"Y-m-d H:i" }} 至 {{ conference.end_date|date:"Y-m-d H:i" }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-1/3">
+                            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">报名时间</span>
+                        </div>
+                        <div class="w-2/3">
+                            <p class="text-base text-gray-900 dark:text-white">
+                                {{ conference.registration_start|date:"Y-m-d H:i" }} 至 {{ conference.registration_end|date:"Y-m-d H:i" }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-1/3">
+                            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">签到时间</span>
+                        </div>
+                        <div class="w-2/3">
+                            <p class="text-base text-gray-900 dark:text-white">
+                                {{ conference.check_in_start|date:"Y-m-d H:i" }} 至 {{ conference.check_in_end|date:"Y-m-d H:i" }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 会议介绍 -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">会议介绍</h2>
+                <div class="prose dark:prose-invert max-w-none">
+                    {{ conference.description|linebreaks }}
+                </div>
+            </div>
+
+            <!-- 地点信息 -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">会议地点</h2>
+                <div class="space-y-4">
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">场地名称</dt>
+                        <dd class="text-base text-gray-900 dark:text-white">{{ conference.venue_name }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">详细地址</dt>
+                        <dd class="text-base text-gray-900 dark:text-white whitespace-pre-line">{{ conference.venue_address }}</dd>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 联系人信息 -->
+            {% if conference.contact_set.exists %}
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">联系人信息</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% for contact in conference.contact_set.all %}
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <h3 class="font-medium text-gray-900 dark:text-white">{{ contact.name }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            <i class="fas fa-phone-alt mr-2"></i>{{ contact.phone }}
+                        </p>
+                        {% if contact.email %}
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                            <i class="fas fa-envelope mr-2"></i>{{ contact.email }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- 右侧信息栏 -->
+        <div class="space-y-6">
+            <!-- 参会人数 -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">参会人数</h2>
+                <div class="space-y-4">
+                    {% if request.user.is_staff or request.user.is_admin %}
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">总人数限制</dt>
+                        <dd class="text-base text-gray-900 dark:text-white">
+                            {{ conference.min_participants }} - {{ conference.max_participants }} 人
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">总人数限制</dt>
+                        <dd class="text-base text-gray-900 dark:text-white">
+                            {{ conference.min_participants }} - {{ conference.max_participants }} 人
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">已报名人数</dt>
+                        <dd class="text-base text-gray-900 dark:text-white">
+                            {{ conference.registration_set.count }} 人
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">已签到人数</dt>
+                        <dd class="text-base text-gray-900 dark:text-white">
+                            {{ conference.checked_in_count }} 人
+                        </dd>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">单位人数限制</dt>
+                        <dd class="text-base text-gray-900 dark:text-white">
+                            {{ conference.company_min_participants }} - {{ conference.company_max_participants }} 人/单位
+                        </dd>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <div class="space-y-4">
+                    <!-- 报名状态和按钮 -->
+                    <div class="space-y-3">
+                        <!-- 报名提示信息 -->
+                        {% if not request.user.is_admin %}
+                        {% if registration_status.is_registration_period %}
+                        <div class="mb-4 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-info-circle text-blue-600 dark:text-blue-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">
+                                        报名信息
+                                    </h3>
+                                </div>
+                                <div class="mt-2 text-sm text-blue-700 dark:text-blue-200">
+                                    <p>
+                                    {% if registration_status.company_spaces_left is not None %}
+                                    您所在单位还可以报名 {{ registration_status.company_spaces_left }} 人
+                                    <p>(每个单位限报 {{ conference.company_max_participants }} 人)</p>
+                                    {% else %}
+                                        您所在单位还可以报名 {{ conference.company_max_participants }} 人
+                                    {% endif %}
+                                    </p>
+                                    {% if registration_status.company_limit_reached %}
+                                    <p class="mt-1 text-red-600 dark:text-red-400">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                                        您所在单位的报名人数已达上限
+                                    </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% if conference.registration_form %}
+                            {% if conference.registration_form.is_formio %}
+                            <a href="{% url 'conference:render_formio' conference.id %}"
+                               class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class="fas fa-edit mr-2"></i>
+                                填写报名表单
+                            </a>
+                            {% else %}
+                            <a href="{% url 'conference:conference_register' conference.id %}"
+                               class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class="fas fa-edit mr-2"></i>
+                                填写报名表单
+                            </a>
+                            {% endif %}
+                        {% endif %}
+                        {% endif %}
+                        {% endif %}
+                    </div>
+
+                    <!-- 在线沟通按钮 -->
+                    <a href="{% url 'chat_view' request.user.id %}" 
+                       class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <i class="fas fa-comments mr-2"></i>
+                        在线沟通
+                    </a>
+
+                    <!-- 会议信息按钮 -->
+                    <a href="{% url 'conference:conference_info' conference.id %}" 
+                       class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        会议信息
+                    </a>
+
+                    <!-- 系统管理按钮 - 仅管理员和工作人员可见 -->
+                    {% if user.is_staff or user.is_superuser %}
+                    <a href="{% url 'conference:dashboard' %}?conference_id={{ conference.id }}" 
+                       class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                        <i class="fas fa-cog mr-2"></i>
+                        会议管理
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 在这里添加任何需要的JavaScript代码
+</script>
+{% endblock %}
+
+<body class="bg-white dark:bg-gray-900">

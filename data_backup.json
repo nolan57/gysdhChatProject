@@ -1,0 +1,24 @@
+[
+{
+  "model": "gysdhChatApp.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$870000$ddOAb9OnwwW4q3Sbz6lWwt$R9ufZw4/CSeVQ+AuSU5eTYvEi4ku9173+R6TqJur/gc=",
+    "last_login": null,
+    "number": "000001",
+    "name": "super",
+    "companyCode": "000001",
+    "email": "wuqiang@ghac.cn",
+    "_encrypted_original_password": "gAAAAABnSdMOx5grnF5b4YtTa6EKIxEQuXJeKOi8rFhNlTUo4R-qa5rLYtTVZURQBMRZUlMj15GP1g7QLEBVhCRbgdFY0GgQGQ==",
+    "group": null,
+    "is_active": true,
+    "is_admin": true,
+    "can_publish_announcements": false,
+    "can_private_message": false,
+    "is_event_staff": false,
+    "is_online": false,
+    "last_activity": "2024-11-29T14:43:26.776Z",
+    "date_joined": "2024-11-29T14:43:26.231Z"
+  }
+}
+]

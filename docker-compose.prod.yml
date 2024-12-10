@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  web:
+    environment:
+      - DJANGO_ENV=production
+    ports:
+      - "8000:8000"
+    restart: always
+    command: gunicorn gysdhChatProject.wsgi:application --bind 0.0.0.0:8000 --workers 4
+
+  db:
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+
+  redis:
+    restart: always
+    command: redis-server --appendonly yes
+
+  celery:
+    restart: always
+    environment:
+      - DJANGO_ENV=production
+    command: celery -A gysdhChatProject worker -l info --concurrency 4
+
+  daphne:
+    restart: always
+    environment:
+      - DJANGO_ENV=production
+    ports:
+      - "8001:8001"
+
+  backup:
+    restart: always
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - BACKUP_KEEP_DAYS=30
+      - BACKUP_FREQUENCY=86400
+    command: |
+      /bin/bash -c '
+      while true; do
+        DATE=$$(date +%Y%m%d_%H%M%S)
+        pg_dump -h db -U $$POSTGRES_USER $$POSTGRES_DB | gzip > /backups/backup_$$DATE.sql.gz
+        find /backups -type f -mtime +$$BACKUP_KEEP_DAYS -delete
+        sleep $$BACKUP_FREQUENCY
+      done
+      '
+
+volumes:
+  postgres_data:
+  redis_data:
+  static_volume:
+  media_volume:

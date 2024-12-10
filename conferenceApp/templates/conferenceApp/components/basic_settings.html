@@ -1,0 +1,49 @@
+<!-- 基础设置卡片 -->
+<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg border-t-4 border-blue-500 hover:shadow-xl transition-all duration-300">
+    <div class="p-6">
+        <div class="flex items-center mb-6">
+            <div class="flex-shrink-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-md p-3">
+                <i class="fas fa-sliders-h text-white text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">基础设置</h3>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">配置系统的基本参数</p>
+            </div>
+        </div>
+        
+        <form method="post" action="{% url 'update_system_settings' %}" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label for="chat_title" class="block text-sm font-medium text-gray-700 dark:text-gray-400">聊天室标题</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <input type="text" name="chat_title" id="chat_title" 
+                           class="block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                           value="{{ settings.chat_title }}"
+                           placeholder="请输入聊天室标题">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <i class="fas fa-heading text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label for="chat_area_title" class="block text-sm font-medium text-gray-700 dark:text-gray-400">聊天区域标题</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <input type="text" name="chat_area_title" id="chat_area_title" 
+                           class="block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                           value="{{ settings.chat_area_title }}"
+                           placeholder="请输入聊天区域标题">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <i class="fas fa-comment-alt text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4">
+                <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    保存设置
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

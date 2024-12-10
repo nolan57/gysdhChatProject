@@ -1,0 +1,34 @@
+<!-- 性能监控卡片 -->
+<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg rounded-lg border-t-4 border-green-500 hover:shadow-xl transition-all duration-300">
+    <div class="p-6">
+        <div class="flex items-center mb-6">
+            <div class="flex-shrink-0 bg-gradient-to-r from-green-500 to-teal-500 rounded-md p-3">
+                <i class="fas fa-tachometer-alt text-white text-xl"></i>
+            </div>
+            <div class="ml-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">性能监控</h3>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">监控系统性能指标</p>
+            </div>
+        </div>
+        <div class="space-y-4">
+            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">CPU 使用率</span>
+                    <span class="text-sm font-medium text-blue-600 dark:text-blue-400">{{ cpu_usage|default:"0" }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                    <div class="bg-blue-600 dark:bg-blue-400 h-2 rounded-full" style="width: {{ cpu_usage|default:0 }}%"></div>
+                </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">内存使用率</span>
+                    <span class="text-sm font-medium text-green-600 dark:text-green-400">{{ memory_usage|default:"0" }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                    <div class="bg-green-600 dark:bg-green-400 h-2 rounded-full" style="width: {{ memory_usage|default:0 }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

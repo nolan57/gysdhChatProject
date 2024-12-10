@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>账号信息更新通知</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #2c5282;">账号信息更新通知</h2>
+        <p>尊敬的 {{ user.name }}：</p>
+        <p>您的GYSDH聊天系统账号信息已更新。以下是您的最新账号信息：</p>
+        
+        <div style="background-color: #f7fafc; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p><strong>账号编号：</strong>{{ user.number }}</p>
+            <p><strong>用户名：</strong>{{ user.name }}</p>
+            <p><strong>公司代码：</strong>{{ user.companyCode }}</p>
+        </div>
+        
+        <p style="color: #718096; font-size: 0.9em;">
+            此邮件由系统自动发送，请勿回复。如有问题，请联系系统管理员。
+        </p>
+    </div>
+</body>
+</html>

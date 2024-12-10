@@ -1,0 +1,181 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}
+<style>
+    :root {
+        --primary: #2563eb;
+        --secondary: #3b82f6;
+        --accent: #1d4ed8;
+        --primary-fg: #fff;
+    }
+
+    /* Header */
+    #header {
+        background: linear-gradient(to right, var(--primary), var(--secondary));
+        color: var(--primary-fg);
+    }
+
+    #header a:link, #header a:visited {
+        color: var(--primary-fg);
+    }
+
+    /* Module headers */
+    .module h2, .module caption {
+        background: var(--primary);
+        color: var(--primary-fg);
+    }
+
+    /* Links */
+    a:link, a:visited {
+        color: var(--primary);
+    }
+
+    a:hover {
+        color: var(--accent);
+    }
+
+    /* Buttons */
+    .button, input[type=submit], input[type=button], .submit-row input {
+        background: var(--primary);
+        color: var(--primary-fg);
+    }
+
+    .button:hover, input[type=submit]:hover, input[type=button]:hover {
+        background: var(--accent);
+    }
+
+    .button.default, input[type=submit].default {
+        background: var(--primary);
+    }
+
+    .button.default:hover, input[type=submit].default:hover {
+        background: var(--accent);
+    }
+
+    /* Message alerts */
+    .messagelist li.success {
+        background: #10B981;
+    }
+
+    .messagelist li.warning {
+        background: #F59E0B;
+    }
+
+    .messagelist li.error {
+        background: #EF4444;
+    }
+
+    /* Breadcrumbs */
+    div.breadcrumbs {
+        background: var(--secondary);
+        color: var(--primary-fg);
+    }
+
+    div.breadcrumbs a {
+        color: var(--primary-fg);
+    }
+
+    /* List page */
+    #changelist-filter h2 {
+        background: var(--primary);
+        color: var(--primary-fg);
+    }
+
+    .object-tools a:link, .object-tools a:visited {
+        background: var(--primary);
+    }
+
+    .object-tools a:hover {
+        background: var(--accent);
+    }
+
+    /* Form controls */
+    .selector-chosen h2 {
+        background: var(--primary) !important;
+        color: var(--primary-fg) !important;
+    }
+
+    .calendar td.selected a {
+        background: var(--primary);
+        color: var(--primary-fg);
+    }
+
+    .calendar td a:hover {
+        background: var(--accent);
+        color: var(--primary-fg);
+    }
+
+    /* Dashboard */
+    .dashboard .module table th {
+        background: var(--primary);
+        color: var(--primary-fg);
+    }
+
+    .dashboard .module table td a:hover {
+        color: var(--accent);
+    }
+
+    /* Custom enhancements */
+    .submit-row {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        padding: 1rem;
+    }
+
+    .module {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+    }
+
+    #content {
+        padding: 1.5rem;
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+        body {
+            background: #1a1a1a;
+            color: #e5e5e5;
+        }
+
+        #container {
+            background: #1a1a1a;
+        }
+
+        .module {
+            background: #2d2d2d;
+        }
+
+        .form-row {
+            border-bottom: 1px solid #404040;
+        }
+
+        input[type=text], input[type=password], input[type=email], textarea, select {
+            background: #333;
+            border: 1px solid #404040;
+            color: #e5e5e5;
+        }
+
+        .submit-row {
+            background: #2d2d2d;
+            border-color: #404040;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        GYSDH会议管理系统
+    </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ conference.name }} - 发送报名通知</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <h5>选择供应商</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="selectAll">
+                                            <label class="form-check-label" for="selectAll">全选</label>
+                                        </div>
+                                    </th>
+                                    <th>公司名称</th>
+                                    <th>联系人</th>
+                                    <th>联系方式</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for company in companies %}
+                                <tr>
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input company-checkbox" type="checkbox" 
+                                                   name="companies" value="{{ company.id }}" 
+                                                   id="company_{{ company.id }}">
+                                        </div>
+                                    </td>
+                                    <td>{{ company.name }}</td>
+                                    <td>
+                                        {% for contact in company.contacts.all %}
+                                        <div>
+                                            {{ contact.name }}
+                                            {% if contact.is_primary %}
+                                            <span class="badge bg-primary">主要联系人</span>
+                                            {% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% for contact in company.contacts.all %}
+                                        <div>{{ contact.phone }}</div>
+                                        <div>{{ contact.email }}</div>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
+                        发送通知
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // 全选/取消全选
+    document.getElementById('selectAll').addEventListener('change', function() {
+        const checkboxes = document.getElementsByClassName('company-checkbox');
+        for (let checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+        }
+        updateSubmitButton();
+    });
+    
+    // 更新提交按钮状态
+    function updateSubmitButton() {
+        const checkboxes = document.getElementsByClassName('company-checkbox');
+        const submitBtn = document.getElementById('submitBtn');
+        let checked = false;
+        
+        for (let checkbox of checkboxes) {
+            if (checkbox.checked) {
+                checked = true;
+                break;
+            }
+        }
+        
+        submitBtn.disabled = !checked;
+    }
+    
+    // 监听单个复选框变化
+    const checkboxes = document.getElementsByClassName('company-checkbox');
+    for (let checkbox of checkboxes) {
+        checkbox.addEventListener('change', updateSubmitButton);
+    }
+</script>
+{% endblock %}
+{% endblock %}

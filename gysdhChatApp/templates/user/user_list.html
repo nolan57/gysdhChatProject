@@ -1,0 +1,734 @@
+{% extends "base.html" %}
+
+{% block title %}用户管理 - GYSDH CHAT{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 页面标题 -->
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center">
+                <i class="fas fa-users text-indigo-600 dark:text-indigo-400 text-4xl mr-4"></i>
+                <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">用户管理</h1>
+            </div>
+            <div class="flex space-x-4">
+                <form id="batch-delete-form" method="post" action="{% url 'batch_delete_users' %}" class="hidden">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_ids[]" id="batch-delete-user-ids">
+                </form>
+                <form id="batch-assign-form" method="post" action="{% url 'batch_assign_group' %}" class="hidden">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_ids[]" id="batch-assign-user-ids">
+                    <input type="hidden" name="group_id" id="batch-assign-group-id">
+                </form>
+                <button onclick="document.getElementById('importModal').classList.remove('hidden')"
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 transform hover:scale-105 transition-all duration-200">
+                    <i class="fas fa-file-import mr-2"></i>
+                    导入用户
+                </button>
+                <a href="{% url 'create_user' %}" 
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 transform hover:scale-105 transition-all duration-200">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    新增用户
+                </a>
+                <a href="{% url 'conference:dashboard' %}" 
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    返回DASHBOARD
+                </a>
+            </div>
+        </div>
+
+        <!-- 筛选表单 -->
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-6">
+            <form method="get" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label for="number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">用户代码</label>
+                        <input type="text" name="number" id="number" value="{{ filters.number }}"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            placeholder="输入用户代码">
+                    </div>
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">姓名</label>
+                        <input type="text" name="name" id="name" value="{{ filters.name }}"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            placeholder="输入姓名">
+                    </div>
+                    <div>
+                        <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">角色</label>
+                        <select name="role" id="role"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <option value="">全部</option>
+                            <option value="admin" {% if filters.role == 'admin' %}selected{% endif %}>管理员</option>
+                            <option value="staff" {% if filters.role == 'staff' %}selected{% endif %}>工作人员</option>
+                            <option value="normal" {% if filters.role == 'normal' %}selected{% endif %}>普通用户</option>
+                        </select>
+                    </div>
+                    <div x-data="{ open: false, selectedTags: {{ filters.tags|safe|default:'[]' }} }" class="relative">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">标签</label>
+                        <div class="mt-1">
+                            <button type="button" @click="open = !open"
+                                class="relative w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <span class="block truncate">
+                                    <template x-if="selectedTags.length === 0">
+                                        <span class="text-gray-500">选择标签</span>
+                                    </template>
+                                    <template x-if="selectedTags.length > 0">
+                                        <span class="flex flex-wrap gap-1">
+                                            <template x-for="tagId in selectedTags" :key="tagId">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">
+                                                    <span x-text="document.querySelector(`[data-tag-id='${tagId}']`).textContent.trim()"></span>
+                                                </span>
+                                            </template>
+                                        </span>
+                                    </template>
+                                </span>
+                                <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                    <i class="fas fa-chevron-down text-gray-400"></i>
+                                </span>
+                            </button>
+                            
+                            <div x-show="open" @click.away="open = false"
+                                class="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                {% for tag in all_tags %}
+                                <div class="relative flex items-center px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                                    @click="selectedTags.includes('{{ tag.id }}') ? selectedTags = selectedTags.filter(id => id !== '{{ tag.id }}') : selectedTags.push('{{ tag.id }}')">
+                                    <input type="checkbox" name="tags" value="{{ tag.id }}" :checked="selectedTags.includes('{{ tag.id }}')"
+                                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                    <span class="ml-3 block truncate" data-tag-id="{{ tag.id }}">
+                                        <i class="fas fa-tag mr-2" style="color: {{ tag.color }};"></i>
+                                        {{ tag.name }}
+                                    </span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">注册时间</label>
+                        <div class="flex space-x-2">
+                            <input type="date" name="start_date" id="start_date" value="{{ filters.start_date }}"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <span class="mt-2 dark:text-gray-300">至</span>
+                            <input type="date" name="end_date" id="end_date" value="{{ filters.end_date }}"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 mt-4">
+                    <a href="{% url 'user_list' %}" 
+                        class="inline-flex justify-center items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200">
+                        <i class="fas fa-undo mr-2"></i>
+                        重置
+                    </a>
+                    <button type="submit"
+                        class="inline-flex justify-center items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
+                        <i class="fas fa-search mr-2"></i>
+                        搜索
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {% if messages %}
+        <div class="fixed top-4 right-4 z-50" id="messages-container">
+            {% for message in messages %}
+            <div class="mb-2 px-4 py-2 rounded-lg shadow-lg {% if message.tags == 'success' %}bg-green-500{% elif message.tags == 'error' %}bg-red-500{% else %}bg-blue-500{% endif %} text-white"
+                x-data="{ show: true }"
+                x-show="show"
+                x-init="setTimeout(() => show = false, 3000)"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 transform translate-x-full"
+                x-transition:enter-end="opacity-100 transform translate-x-0"
+                x-transition:leave="transition ease-in duration-300"
+                x-transition:leave-start="opacity-100 transform translate-x-0"
+                x-transition:leave-end="opacity-0 transform translate-x-full">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- 用户列表 -->
+        <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg mb-6">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-900">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <input type="checkbox" id="select-all" class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">用户编号</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">用户名</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">标签</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">角色</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">注册时间</th>
+                            <th scope="col" class="relative px-6 py-3">
+                                <span class="sr-only">操作</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        {% for user in users %}
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" name="user_ids[]" value="{{ user.id }}" class="user-checkbox rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">{{ user.number }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">{{ user.name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex flex-wrap gap-1">
+                                    {% for user_tag in user.user_tags.all %}
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" 
+                                          style="background-color: {{ user_tag.tag.color }}20; color: {{ user_tag.tag.color }};">
+                                        <i class="fas fa-tag mr-2" style="color: {{ user_tag.tag.color }};"></i>
+                                        {{ user_tag.tag.name }}
+                                    </span>
+                                    {% endfor %}
+                                    <button onclick="window.location.href='{% url 'manage_user_tags' user.id %}'"
+                                            class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200">
+                                        <i class="fas fa-plus mr-1"></i>
+                                        管理标签
+                                    </button>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if user.is_admin %}bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200{% elif user.is_event_staff %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200{% else %}bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300{% endif %}">
+                                    {% if user.is_admin %}
+                                        管理员
+                                    {% elif user.is_event_staff %}
+                                        工作人员
+                                    {% else %}
+                                        普通用户
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                                {{ user.date_joined|date:"Y-m-d H:i" }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex justify-end space-x-4">
+                                    <a href="{% url 'update_user' user.id %}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-500 transition-colors duration-200">
+                                        <i class="fas fa-edit"></i> 修改
+                                    </a>
+                                    <form method="post" action="{% url 'reset_password' user.id %}" class="inline-block" onsubmit="return confirm('确定要重置用户 {{ user.name }} 的密码吗？重置后的密码将会显示在页面上。');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-500 transition-colors duration-200 mx-4">
+                                            <i class="fas fa-key"></i> 重置密码
+                                        </button>
+                                    </form>
+                                    <form method="post" action="{% url 'delete_user' user.id %}" class="inline-block" onsubmit="return confirm('确定要删除用户 {{ user.name }} 吗？');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-500 transition-colors duration-200">
+                                            <i class="fas fa-trash-alt"></i> 删除
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                暂无用户数据
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if is_paginated %}
+            <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-600 sm:px-6">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        上一页
+                    </a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        下一页
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700 dark:text-gray-400">
+                            显示第 <span class="font-medium">{{ page_obj.start_index }}</span> 到 
+                            <span class="font-medium">{{ page_obj.end_index }}</span> 条，
+                            共 <span class="font-medium">{{ paginator.count }}</span> 条记录
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <span class="sr-only">上一页</span>
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                            {% endif %}
+
+                            {% for i in paginator.page_range %}
+                            {% if page_obj.number == i %}
+                            <span class="relative inline-flex items-center px-4 py-2 border border-indigo-500 dark:border-indigo-600 bg-indigo-50 dark:bg-indigo-600 text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                                {{ i }}
+                            </span>
+                            {% else %}
+                            <a href="?page={{ i }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                {{ i }}
+                            </a>
+                            {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <span class="sr-only">下一页</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- 批量操作区域 -->
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">批量操作</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- 批量发送邮件按钮 -->
+                <div class="space-y-2">
+                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">发送邮件</h4>
+                    <button onclick="openBatchEmailModal()" type="button"
+                        class="w-full inline-flex justify-between items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 transition-all duration-200">
+                        <span class="flex items-center">
+                            <i class="fas fa-envelope mr-2"></i>
+                            批量发送邮件
+                        </span>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <!-- 批量设置用户组 -->
+                <div class="space-y-2">
+                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">设置用户组</h4>
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" type="button"
+                            class="w-full inline-flex justify-between items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 transition-all duration-200">
+                            <span class="flex items-center">
+                                <i class="fas fa-users-cog mr-2"></i>
+                                批量添加到用户组
+                            </span>
+                            <i class="fas fa-chevron-down ml-2 transition-transform duration-200" :class="{ 'transform rotate-180': open }"></i>
+                        </button>
+                        <div x-show="open" @click.away="open = false"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="absolute left-0 right-0 mt-2 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
+                            <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                {% for group in groups %}
+                                <a href="#" onclick="handleBatchAssignGroup({{ group.id }}, '{{ group.name }}')"
+                                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white" role="menuitem">
+                                    {{ group.name }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 批量设置标签 -->
+                <div class="space-y-2">
+                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">设置标签</h4>
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" type="button"
+                            class="w-full inline-flex justify-between items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 transform hover:scale-105 transition-all duration-200">
+                            <span class="flex items-center">
+                                <i class="fas fa-tags mr-2"></i>
+                                批量添加标签
+                            </span>
+                            <i class="fas fa-chevron-down ml-2 transition-transform duration-200" :class="{ 'transform rotate-180': open }"></i>
+                        </button>
+                        <div x-show="open" @click.away="open = false"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="absolute left-0 right-0 mt-2 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
+                            <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                                {% for tag in all_tags %}
+                                <a href="#" onclick="handleBatchAssignTags('add', {{ tag.id }}, '{{ tag.name }}')"
+                                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white" role="menuitem">
+                                    <span class="inline-flex items-center">
+                                        <i class="fas fa-tag mr-2" style="color: {{ tag.color }};"></i>
+                                        {{ tag.name }}
+                                    </span>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="handleBatchRemoveTags()"
+                            class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 transform hover:scale-105 transition-all duration-200">
+                        <i class="fas fa-tag-slash mr-2"></i>
+                        批量移除标签
+                    </button>
+                </div>
+
+                <!-- 批量删除 -->
+                <div class="space-y-2">
+                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">其他操作</h4>
+                    <button onclick="handleBatchDelete()" 
+                            class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 transform hover:scale-105 transition-all duration-200">
+                        <i class="fas fa-trash-alt mr-2"></i>
+                        批量删除用户
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 导入用户模态框 -->
+        <div id="importModal" class="hidden fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <form method="post" action="{% url 'import_users' %}" enctype="multipart/form-data" class="p-6">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-300" id="modal-title">导入用户</h3>
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">请选择Excel文件(.xlsx)导入用户数据。文件中应包含以下列：用户名、密码、邮箱、姓、名、是否管理员。</p>
+                        </div>
+                        <div class="mt-4">
+                            <input type="file" name="file" accept=".xlsx" required
+                                class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 dark:file:bg-indigo-600 file:text-indigo-700 dark:file:text-indigo-300 hover:file:bg-indigo-100 dark:hover:file:bg-indigo-700"/>
+                        </div>
+                        <div class="mt-6 flex justify-end space-x-3">
+                            <button type="button" onclick="document.getElementById('importModal').classList.add('hidden')"
+                                class="inline-flex justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200">
+                                取消
+                            </button>
+                            <button type="submit"
+                                class="inline-flex justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500 hover:from-indigo-700 hover:to-purple-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                开始导入
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 批量发送邮件模态框 -->
+        <div id="batchEmailModal" class="hidden fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <form id="batchEmailForm" method="post" action="{% url 'batch_send_email' %}" class="p-6">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-300" id="modal-title">批量发送邮件</h3>
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">请选择邮件模板和输入邮件主题。</p>
+                        </div>
+                        <div class="mt-4">
+                            <label for="email-template-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300">邮件模板</label>
+                            <select name="template_id" id="email-template-select"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <option value="">请选择模板</option>
+                                {% for template in email_templates %}
+                                <option value="{{ template.id }}">{{ template.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mt-4">
+                            <label for="email-subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300">邮件主题</label>
+                            <input type="text" name="subject" id="email-subject"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                placeholder="输入邮件主题">
+                        </div>
+                        <div class="mt-6 flex justify-end space-x-3">
+                            <button type="button" onclick="closeBatchEmailModal()"
+                                class="inline-flex justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200">
+                                取消
+                            </button>
+                            <button id="batchEmailSubmitBtn" type="submit" onclick="handleBatchSendEmail()"
+                                class="inline-flex justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500 hover:from-indigo-700 hover:to-purple-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                发送邮件
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- JavaScript 代码 -->
+        <script>
+            // Select all functionality
+            const selectAllCheckbox = document.getElementById('select-all');
+            const userCheckboxes = document.querySelectorAll('input[name="user_ids[]"]');
+
+            // Update select-all checkbox state based on individual checkboxes
+            function updateSelectAllState() {
+                const checkedCount = document.querySelectorAll('input[name="user_ids[]"]:checked').length;
+                const totalCount = userCheckboxes.length;
+                selectAllCheckbox.checked = checkedCount === totalCount;
+                selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < totalCount;
+            }
+
+            // Add event listener to select-all checkbox
+            selectAllCheckbox.addEventListener('change', function() {
+                userCheckboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+            });
+
+            // Add event listeners to individual checkboxes
+            userCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectAllState);
+            });
+
+            function handleBatchDelete() {
+                const checkboxes = document.querySelectorAll('input[name="user_ids[]"]:checked');
+                if (checkboxes.length === 0) {
+                    alert('请选择要删除的用户');
+                    return;
+                }
+
+                if (confirm(`确定要删除选中的 ${checkboxes.length} 个用户吗？`)) {
+                    const userIds = Array.from(checkboxes).map(cb => cb.value);
+                    document.getElementById('batch-delete-user-ids').value = userIds.join(',');
+                    document.getElementById('batch-delete-form').submit();
+                }
+            }
+
+            function handleBatchAssignGroup(groupId, groupName) {
+                const checkedBoxes = document.querySelectorAll('input[name="user_ids[]"]:checked');
+                if (checkedBoxes.length === 0) {
+                    alert('请选择要添加到用户组的用户');
+                    return;
+                }
+
+                if (confirm(`确定要将选中的用户添加到 ${groupName} 用户组吗？`)) {
+                    const userIds = Array.from(checkedBoxes).map(box => box.value);
+                    document.getElementById('batch-assign-user-ids').value = userIds.join(',');
+                    document.getElementById('batch-assign-group-id').value = groupId;
+                    document.getElementById('batch-assign-form').submit();
+                }
+            }
+
+            // 批量设置标签
+            function handleBatchAssignTags(action, tagId, tagName) {
+                const selectedUsers = getSelectedUsers();
+                if (selectedUsers.length === 0) {
+                    showToast('请选择要操作的用户', 'error');
+                    return;
+                }
+
+                if (!confirm(`确定要为选中的用户添加标签"${tagName}"吗？`)) {
+                    return;
+                }
+
+                const formData = new FormData();
+                selectedUsers.forEach(userId => formData.append('user_ids[]', userId));
+                formData.append('tag_ids[]', tagId);
+                formData.append('action', action);
+
+                fetch('{% url "batch_assign_tags" %}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showToast('标签添加成功', 'success');
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        showToast(data.message || '操作失败', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('操作失败', 'error');
+                });
+            }
+
+            // 批量移除标签
+            function handleBatchRemoveTags() {
+                const selectedUsers = getSelectedUsers();
+                if (selectedUsers.length === 0) {
+                    showToast('请选择要操作的用户', 'error');
+                    return;
+                }
+
+                if (!confirm('确定要移除选中用户的所有标签吗？')) {
+                    return;
+                }
+
+                const formData = new FormData();
+                selectedUsers.forEach(userId => formData.append('user_ids[]', userId));
+                formData.append('action', 'remove_all');
+
+                fetch('{% url "batch_assign_tags" %}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showToast('标签移除成功', 'success');
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        showToast(data.message || '操作失败', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('操作失败', 'error');
+                });
+            }
+
+            // 批量发送邮件相关函数
+            let isSending = false;  // Add this at the top of your script section
+            function openBatchEmailModal() {
+                const selectedUsers = getSelectedUsers();
+                console.log('Selected Users:', selectedUsers);
+                if (selectedUsers.length === 0) {
+                    showToast('请选择至少一个用户', 'error');
+                    return;
+                }
+                document.getElementById('batchEmailModal').classList.remove('hidden');
+            }
+
+            function closeBatchEmailModal() {
+                document.getElementById('batchEmailModal').classList.add('hidden');
+            }
+
+            function handleBatchSendEmail() {
+                if (isSending) {
+                    console.log('Already sending emails, please wait...');
+                    return;
+                }
+
+                const selectedUsers = getSelectedUsers();
+                console.log('Selected Users:', selectedUsers);
+                if (selectedUsers.length === 0) {
+                    showToast('请选择至少一个用户', 'error');
+                    return;
+                }
+
+                const form = document.getElementById('batchEmailForm');
+                const formData = new FormData(form);
+                
+                // 清除之前可能存在的user_ids[]
+                formData.delete('user_ids[]');
+                
+                // 添加选中的用户ID
+                selectedUsers.forEach(userId => {
+                    formData.append('user_ids[]', userId);
+                });
+
+                // 打印FormData内容
+                console.log('FormData Entries:');
+                for (let [key, value] of formData.entries()) {
+                    console.log(`${key}: ${value}`);
+                }
+
+                // 检查必需的字段
+                const templateId = formData.get('template_id');
+                if (!templateId) {
+                    showToast('请选择邮件模板', 'error');
+                    return;
+                }
+
+                // 确认发送
+                if (!confirm(`确定要向${selectedUsers.length}位用户发送邮件吗？`)) {
+                    return;
+                }
+
+                // Set loading state
+                isSending = true;
+                const submitButton = document.querySelector('#batchEmailSubmitBtn');
+                const originalText = submitButton.innerHTML;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 发送中...';
+                submitButton.disabled = true;
+
+                // 发送请求
+                fetch('{% url "batch_send_email" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json().then(data => {
+                        console.log('Response data:', data);
+                        if (!response.ok) {
+                            throw new Error(data.message || 'Network response was not ok');
+                        }
+                        return data;
+                    });
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        showToast('邮件发送请求已提交，正在处理中');
+                        closeBatchEmailModal();
+                    } else {
+                        showToast(data.message || '发送失败', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('发送请求失败：' + error.message, 'error');
+                })
+                .finally(() => {
+                    // Reset loading state
+                    isSending = false;
+                    submitButton.innerHTML = originalText;
+                    submitButton.disabled = false;
+                });
+            }
+
+            // 辅助函数：获取选中的用户ID
+            function getSelectedUsers() {
+                return Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.value);
+            }
+
+            // 辅助函数：显示提示消息
+            function showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `fixed top-4 right-4 p-4 rounded-lg z-50 ${
+                    type === 'success' ? 'bg-green-500' : 'bg-red-500'
+                } text-white shadow-lg transform transition-all duration-300 translate-y-0`;
+                toast.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.transform = 'translateY(-100%)';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+        </script>
+    </div>
+</div>
+
+{% endblock %}

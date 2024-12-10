@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ conference.name }} - {% if is_edit %}编辑参会人员{% else %}会议报名{% endif %}</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ registration_form.title }}</h5>
+            <p class="card-text text-muted">{{ registration_form.description }}</p>
+            
+            <form method="post" id="registrationForm">
+                {% csrf_token %}
+                
+                <!-- 基本信息 -->
+                <div class="mb-4">
+                    <h5>基本信息</h5>
+                    
+                    <div class="mb-3">
+                        <label for="name" class="form-label">姓名</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               value="{{ participant.name|default:'' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="position" class="form-label">职位</label>
+                        <input type="text" class="form-control" id="position" name="position" 
+                               value="{{ participant.position|default:'' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">联系电话</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" 
+                               value="{{ participant.phone|default:'' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">电子邮箱</label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                               value="{{ participant.email|default:'' }}" required>
+                    </div>
+                </div>
+                
+                <!-- 动态表单字段 -->
+                {% if not is_edit %}
+                <div class="mb-4">
+                    <h5>其他信息</h5>
+                    
+                    {% for field in registration_form.fields.all %}
+                    <div class="mb-3">
+                        <label for="field_{{ field.id }}" class="form-label">
+                            {{ field.label }}
+                            {% if field.required %}
+                            <span class="text-danger">*</span>
+                            {% endif %}
+                        </label>
+                        
+                        {% if field.field_type == 'text' %}
+                        <input type="text" class="form-control" id="field_{{ field.id }}" 
+                               name="field_{{ field.id }}" {% if field.required %}required{% endif %}>
+                        
+                        {% elif field.field_type == 'number' %}
+                        <input type="number" class="form-control" id="field_{{ field.id }}" 
+                               name="field_{{ field.id }}" {% if field.required %}required{% endif %}>
+                        
+                        {% elif field.field_type == 'email' %}
+                        <input type="email" class="form-control" id="field_{{ field.id }}" 
+                               name="field_{{ field.id }}" {% if field.required %}required{% endif %}>
+                        
+                        {% elif field.field_type == 'date' %}
+                        <input type="date" class="form-control" id="field_{{ field.id }}" 
+                               name="field_{{ field.id }}" {% if field.required %}required{% endif %}>
+                        
+                        {% elif field.field_type == 'textarea' %}
+                        <textarea class="form-control" id="field_{{ field.id }}" 
+                                  name="field_{{ field.id }}" rows="3" 
+                                  {% if field.required %}required{% endif %}></textarea>
+                        
+                        {% elif field.field_type == 'select' %}
+                        <select class="form-select" id="field_{{ field.id }}" 
+                                name="field_{{ field.id }}" {% if field.required %}required{% endif %}>
+                            <option value="">请选择</option>
+                            {% for option in field.options.all %}
+                            <option value="{{ option.value }}">{{ option.value }}</option>
+                            {% endfor %}
+                        </select>
+                        
+                        {% elif field.field_type == 'radio' %}
+                        <div>
+                            {% for option in field.options.all %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" 
+                                       name="field_{{ field.id }}" id="field_{{ field.id }}_{{ forloop.counter }}"
+                                       value="{{ option.value }}" {% if field.required %}required{% endif %}>
+                                <label class="form-check-label" for="field_{{ field.id }}_{{ forloop.counter }}">
+                                    {{ option.value }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        {% elif field.field_type == 'checkbox' %}
+                        <div>
+                            {% for option in field.options.all %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" 
+                                       name="field_{{ field.id }}" id="field_{{ field.id }}_{{ forloop.counter }}"
+                                       value="{{ option.value }}">
+                                <label class="form-check-label" for="field_{{ field.id }}_{{ forloop.counter }}">
+                                    {{ option.value }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if field.help_text %}
+                        <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'conference:company_registration_manage' conference_id=conference.id %}" 
+                       class="btn btn-secondary">返回</a>
+                    <button type="submit" class="btn btn-primary">
+                        {% if is_edit %}保存修改{% else %}提交报名{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // 表单验证
+    document.getElementById('registrationForm').addEventListener('submit', function(event) {
+        const form = event.target;
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+
+    // 加载表单逻辑规则
+    const formLogicRules = {{ logic_rules_json|safe }};
+    
+    // 初始化字段值监听器
+    function initFieldListeners() {
+        const fields = document.querySelectorAll('input, select, textarea');
+        fields.forEach(field => {
+            field.addEventListener('change', function() {
+                evaluateLogicRules(this);
+            });
+            
+            // 对于文本输入，也监听键盘输入
+            if (field.type === 'text' || field.type === 'textarea') {
+                field.addEventListener('input', function() {
+                    evaluateLogicRules(this);
+                });
+            }
+        });
+    }
+    
+    // 评估字段值并执行逻辑规则
+    function evaluateLogicRules(changedField) {
+        // 获取字段ID
+        const fieldId = changedField.id.replace('field_', '');
+        
+        // 获取该字段触发的所有规则
+        const rules = formLogicRules.filter(rule => rule.trigger_field_id === fieldId);
+        
+        // 按条件组和优先级排序规则
+        const sortedRules = rules.sort((a, b) => {
+            if (a.condition_group === b.condition_group) {
+                return a.priority - b.priority;
+            }
+            return (a.condition_group || '').localeCompare(b.condition_group || '');
+        });
+        
+        // 按条件组执行规则
+        const groupedRules = {};
+        sortedRules.forEach(rule => {
+            const group = rule.condition_group || 'default';
+            if (!groupedRules[group]) {
+                groupedRules[group] = [];
+            }
+            groupedRules[group].push(rule);
+        });
+        
+        // 遍历每个条件组
+        Object.values(groupedRules).forEach(groupRules => {
+            let groupResult = true;
+            
+            // 评估组内所有规则
+            groupRules.forEach(rule => {
+                const triggerValue = getFieldValue(changedField);
+                const conditionMet = evaluateCondition(rule.operator, triggerValue, rule.value);
+                
+                if (!conditionMet) {
+                    groupResult = false;
+                }
+            });
+            
+            // 如果组内所有条件都满足，执行动作
+            if (groupResult) {
+                groupRules.forEach(rule => {
+                    executeAction(rule);
+                });
+            }
+        });
+    }
+    
+    // 获取字段值
+    function getFieldValue(field) {
+        if (field.type === 'checkbox') {
+            const checkboxes = document.querySelectorAll(
+                `input[name="${field.name}"]:checked`
+            );
+            return Array.from(checkboxes).map(cb => cb.value);
+        } else if (field.type === 'radio') {
+            const radio = document.querySelector(
+                `input[name="${field.name}"]:checked`
+            );
+            return radio ? radio.value : null;
+        } else {
+            return field.value;
+        }
+    }
+    
+    // 评估条件
+    function evaluateCondition(operator, fieldValue, compareValue) {
+        switch (operator) {
+            case 'equals':
+                return fieldValue === compareValue;
+            case 'not_equals':
+                return fieldValue !== compareValue;
+            case 'contains':
+                return Array.isArray(fieldValue) 
+                    ? fieldValue.includes(compareValue)
+                    : String(fieldValue).includes(compareValue);
+            case 'not_contains':
+                return Array.isArray(fieldValue)
+                    ? !fieldValue.includes(compareValue)
+                    : !String(fieldValue).includes(compareValue);
+            case 'greater_than':
+                return Number(fieldValue) > Number(compareValue);
+            case 'less_than':
+                return Number(fieldValue) < Number(compareValue);
+            case 'in':
+                return Array.isArray(compareValue) && compareValue.includes(fieldValue);
+            case 'not_in':
+                return Array.isArray(compareValue) && !compareValue.includes(fieldValue);
+            case 'starts_with':
+                return String(fieldValue).startsWith(compareValue);
+            case 'ends_with':
+                return String(fieldValue).endsWith(compareValue);
+            case 'is_empty':
+                return !fieldValue || fieldValue.length === 0;
+            case 'is_not_empty':
+                return fieldValue && fieldValue.length > 0;
+            case 'between':
+                if (Array.isArray(compareValue) && compareValue.length === 2) {
+                    const value = Number(fieldValue);
+                    return value >= Number(compareValue[0]) && value <= Number(compareValue[1]);
+                }
+                return false;
+            default:
+                return false;
+        }
+    }
+    
+    // 执行动作
+    function executeAction(rule) {
+        const targetField = document.getElementById(`field_${rule.target_field_id}`);
+        if (!targetField) return;
+        
+        const fieldContainer = targetField.closest('.mb-3');
+        
+        switch (rule.action) {
+            case 'show':
+                fieldContainer.style.display = 'block';
+                break;
+            case 'hide':
+                fieldContainer.style.display = 'none';
+                break;
+            case 'enable':
+                targetField.disabled = false;
+                break;
+            case 'disable':
+                targetField.disabled = true;
+                break;
+            case 'require':
+                targetField.required = true;
+                break;
+            case 'unrequire':
+                targetField.required = false;
+                break;
+            case 'set_value':
+                if (targetField.type === 'checkbox' || targetField.type === 'radio') {
+                    const inputs = document.querySelectorAll(
+                        `input[name="${targetField.name}"]`
+                    );
+                    inputs.forEach(input => {
+                        input.checked = input.value === rule.action_value;
+                    });
+                } else {
+                    targetField.value = rule.action_value;
+                }
+                // 触发change事件以便级联评估其他规则
+                targetField.dispatchEvent(new Event('change'));
+                break;
+            case 'clear_value':
+                if (targetField.type === 'checkbox' || targetField.type === 'radio') {
+                    const inputs = document.querySelectorAll(
+                        `input[name="${targetField.name}"]`
+                    );
+                    inputs.forEach(input => {
+                        input.checked = false;
+                    });
+                } else {
+                    targetField.value = '';
+                }
+                // 触发change事件以便级联评估其他规则
+                targetField.dispatchEvent(new Event('change'));
+                break;
+        }
+    }
+    
+    // 初始化表单
+    document.addEventListener('DOMContentLoaded', function() {
+        initFieldListeners();
+        
+        // 初始评估所有字段
+        const fields = document.querySelectorAll('input, select, textarea');
+        fields.forEach(field => {
+            evaluateLogicRules(field);
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}
